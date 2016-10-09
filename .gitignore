@@ -30,3 +30,4 @@
 
 # Qt files
 *.pro.user
+*.qmake.stash

@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I../../../../dev/include -I../../../../dev/include/bullet -isystem /usr/include/openvdb -Iinclude -I../../../../Qt5.7.0/5.7/gcc_64/include -I../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets -I../../../../Qt5.7.0/5.7/gcc_64/include/QtGui -I../../../../Qt5.7.0/5.7/gcc_64/include/QtCore -Imoc -I../../../../Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++
+INCPATH       = -I. -I../../../../dev/include -I../../../../dev/include/bullet -isystem /usr/include/openvdb -Iinclude -I../../../../Qt5.7.0/5.7/gcc_64/include -I../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets -I../../../../Qt5.7.0/5.7/gcc_64/include/QtGui -I../../../../Qt5.7.0/5.7/gcc_64/include/QtCore -Imoc -Iform -I../../../../Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/idris/Qt5.7.0/5.7/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -48,8 +48,11 @@ OBJECTS_DIR   = obj/
 
 ####### Files
 
-SOURCES       = src/main.cpp 
-OBJECTS       = obj/main.o
+SOURCES       = src/main.cpp \
+		src/mainwindow.cpp moc/moc_mainwindow.cpp
+OBJECTS       = obj/main.o \
+		obj/mainwindow.o \
+		obj/moc_mainwindow.o
 DIST          = ../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/common/unix.conf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/common/linux.conf \
@@ -199,7 +202,8 @@ DIST          = ../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/exceptions.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/yacc.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/lex.prf \
-		masterclass.pro include/*.h src/main.cpp
+		masterclass.pro include/mainwindow.h src/main.cpp \
+		src/mainwindow.cpp
 QMAKE_TARGET  = masterclass
 DESTDIR       = bin/
 TARGET        = bin/masterclass
@@ -208,7 +212,7 @@ TARGET        = bin/masterclass
 first: all
 ####### Build rules
 
-$(TARGET):  $(OBJECTS)  
+$(TARGET): form/ui_mainwindow.h $(OBJECTS)  
 	@test -d bin/ || mkdir -p bin/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -533,8 +537,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents include/*.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ui/mainwindow.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -560,24 +565,461 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc/moc_mainwindow.cpp
 compiler_moc_header_clean:
+	-$(DEL_FILE) moc/moc_mainwindow.cpp
+moc/moc_mainwindow.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmainwindow.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfeatures.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypetraits.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qisenum.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qversiontagging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qalgorithms.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiterator.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpair.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qregexp.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmetatype.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmargins.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrect.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsize.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpalette.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcolor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgb.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgba64.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qbrush.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvector.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qmatrix.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpolygon.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qregion.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdatastream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiodevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qline.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtransform.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpainterpath.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qimage.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixelformat.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qshareddata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhash.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfont.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcursor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qkeysequence.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvariant.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdebug.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtextstream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlocale.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qset.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurlquery.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfile.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfiledevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector2d.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qicon.h \
+		include/mainwindow.h \
+		../../../../Qt5.7.0/5.7/gcc_64/bin/moc
+	/home/idris/Qt5.7.0/5.7/gcc_64/bin/moc $(DEFINES) -I/home/idris/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++ -I/home/idris/uni/masterclass/masterclass/dev -I/home/idris/dev/include -I/home/idris/dev/include/bullet -I/usr/include/openvdb -I/home/idris/uni/masterclass/masterclass/dev/include -I/home/idris/Qt5.7.0/5.7/gcc_64/include -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtWidgets -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtGui -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/mainwindow.h -o moc/moc_mainwindow.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all:
+compiler_uic_make_all: form/ui_mainwindow.h
 compiler_uic_clean:
+	-$(DEL_FILE) form/ui_mainwindow.h
+form/ui_mainwindow.h: ui/mainwindow.ui \
+		../../../../Qt5.7.0/5.7/gcc_64/bin/uic
+	/home/idris/Qt5.7.0/5.7/gcc_64/bin/uic ui/mainwindow.ui -o form/ui_mainwindow.h
+
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
 compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: 
+compiler_clean: compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
-obj/main.o: src/main.cpp 
+obj/main.o: src/main.cpp include/mainwindow.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmainwindow.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfeatures.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypetraits.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qisenum.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qversiontagging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qalgorithms.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiterator.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpair.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qregexp.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmetatype.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmargins.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrect.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsize.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpalette.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcolor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgb.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgba64.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qbrush.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvector.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qmatrix.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpolygon.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qregion.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdatastream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiodevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qline.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtransform.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpainterpath.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qimage.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixelformat.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qshareddata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhash.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfont.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcursor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qkeysequence.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvariant.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdebug.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtextstream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlocale.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qset.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurlquery.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfile.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfiledevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector2d.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qicon.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QApplication \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qapplication.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qeventloop.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qguiapplication.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qinputmethod.h \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
+		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main.o src/main.cpp
+
+obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmainwindow.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfeatures.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypetraits.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qisenum.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qversiontagging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qalgorithms.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiterator.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpair.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qregexp.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmetatype.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmargins.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrect.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsize.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpalette.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcolor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgb.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgba64.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qbrush.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvector.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qmatrix.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpolygon.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qregion.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdatastream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiodevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qline.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtransform.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpainterpath.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qimage.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixelformat.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qshareddata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhash.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfont.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcursor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qkeysequence.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvariant.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdebug.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtextstream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlocale.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qset.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurlquery.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfile.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfiledevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector2d.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qicon.h \
+		form/ui_mainwindow.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/mainwindow.o src/mainwindow.cpp
+
+obj/moc_mainwindow.o: moc/moc_mainwindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_mainwindow.o moc/moc_mainwindow.cpp
 
 ####### Install
 

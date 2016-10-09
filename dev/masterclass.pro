@@ -14,7 +14,8 @@ HEADERS  += $$PWD/include/*.h
 
 OBJECTS_DIR = ./obj
 MOC_DIR = ./moc
-
+UI_DIR += ./form
+FORMS    += ./ui/mainwindow.ui
 
 # include paths for boost and openvdb
 INCLUDEPATH +=	/home/idris/dev/include \
