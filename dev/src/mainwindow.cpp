@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    m_glScene = new OpenGLScene(this);
+    ui->gridLayout->addWidget(m_glScene, 0, 0, 1, 1);
 
     //---------------------------------------------------------------------------------------------------------------------------------
     // Boilerplate bullet initialisation
@@ -106,5 +108,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_glScene;
 }
 
