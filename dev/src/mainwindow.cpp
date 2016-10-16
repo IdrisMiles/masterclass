@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_glScene = new OpenGLScene(this);
     ui->gridLayout->addWidget(m_glScene, 0, 0, 1, 1);
 
+    connect(ui->s_LoadAlembic, SIGNAL(released()), m_glScene, SLOT(LoadAlembic()));
+
     //---------------------------------------------------------------------------------------------------------------------------------
     // Boilerplate bullet initialisation
     btBroadphaseInterface *broadPhase = new btDbvtBroadphase();

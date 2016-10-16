@@ -36,7 +36,7 @@ DISTNAME      = masterclass1.0.0
 DISTDIR = /home/idris/uni/masterclass/masterclass/dev/obj/masterclass1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/idris/Qt5.7.0/5.7/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/idris/dev/lib -lBulletDynamics -lBulletCollision -lLinearMath -L/usr/local/lib -L/usr/lib/x86_64/ -lopenvdb -ltbb -lHalf -lAlembic -lImath -lIex -lIexMath -lIlmThread -pthread -lhdf5_serial -L/home/idris/Qt5.7.0/5.7/gcc_64/lib -lQt5Widgets -L/usr/lib64 -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/home/idris/dev/lib -lBulletDynamics -lBulletCollision -lLinearMath -L/usr/local/lib -L/usr/lib/x86_64/ -lopenvdb -ltbb -lHalf -lAlembic -lImath -lIex -lIexMath -lIlmThread -pthread -lhdf5_serial -L/usr/lib -lGLU -lGLEW -L/home/idris/Qt5.7.0/5.7/gcc_64/lib -lQt5Widgets -L/usr/lib64 -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -797,12 +797,6 @@ moc/moc_mainwindow.cpp: ../../../../dev/include/bullet/btBulletDynamicsCommon.h 
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qt_windows.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengles2ext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLFunctions \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglfunctions.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLShaderProgram \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglshaderprogram.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector3d.h \
@@ -812,6 +806,7 @@ moc/moc_mainwindow.cpp: ../../../../dev/include/bullet/btBulletDynamicsCommon.h 
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qgenericmatrix.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLVertexArrayObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglvertexarrayobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
 		include/mainwindow.h \
@@ -923,12 +918,6 @@ moc/moc_openglscene.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenG
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qt_windows.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengles2ext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLFunctions \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglfunctions.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLShaderProgram \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglshaderprogram.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector3d.h \
@@ -938,6 +927,7 @@ moc/moc_openglscene.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenG
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qgenericmatrix.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLVertexArrayObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglvertexarrayobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
 		include/openglscene.h \
@@ -1187,12 +1177,6 @@ obj/main.o: src/main.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qt_windows.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengles2ext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLFunctions \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglfunctions.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLShaderProgram \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglshaderprogram.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector3d.h \
@@ -1202,6 +1186,7 @@ obj/main.o: src/main.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qgenericmatrix.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLVertexArrayObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglvertexarrayobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QApplication \
@@ -1437,12 +1422,6 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qt_windows.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengles2ext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLFunctions \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglfunctions.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLShaderProgram \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglshaderprogram.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector3d.h \
@@ -1452,51 +1431,10 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qgenericmatrix.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLVertexArrayObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglvertexarrayobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
-		form/ui_mainwindow.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QVariant \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QAction \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qaction.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qactiongroup.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QApplication \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qapplication.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreapplication.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qeventloop.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qguiapplication.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qinputmethod.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QButtonGroup \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qbuttongroup.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QGridLayout \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qgridlayout.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qlayout.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qlayoutitem.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qboxlayout.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QHeaderView \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qheaderview.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qabstractitemview.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qframe.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qabstractitemmodel.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qitemselectionmodel.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qstyleoption.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvalidator.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qregularexpression.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qslider.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qabstractslider.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qstyle.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabbar.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qrubberband.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMenuBar \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmenubar.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmenu.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QStatusBar \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qstatusbar.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QToolBar \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtoolbar.h
+		form/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/mainwindow.o src/mainwindow.cpp
 
 obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
@@ -1605,12 +1543,6 @@ obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qt_windows.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengles2ext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLFunctions \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglfunctions.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLShaderProgram \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglshaderprogram.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector3d.h \
@@ -1620,9 +1552,14 @@ obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qgenericmatrix.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLVertexArrayObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglvertexarrayobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QMouseEvent
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QMouseEvent \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLContext \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/openglscene.o src/openglscene.cpp
 
 obj/moc_mainwindow.o: moc/moc_mainwindow.cpp 

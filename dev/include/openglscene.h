@@ -2,8 +2,9 @@
 #define OPENGLSCENE_H
 
 
+#include <GL/glew.h>
+
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
@@ -13,7 +14,18 @@
 
 
 
-class OpenGLScene : public QOpenGLWidget, protected QOpenGLFunctions
+// Alembic includes
+#include "Alembic/AbcGeom/All.h"
+#include "Alembic/AbcCoreAbstract/All.h"
+#include "Alembic/AbcCoreHDF5/All.h"
+#include "Alembic/Abc/ErrorHandler.h"
+
+
+
+using namespace Alembic::Abc;
+using namespace Alembic::AbcGeom;
+
+class OpenGLScene : public QOpenGLWidget
 {
 
     Q_OBJECT
@@ -26,6 +38,7 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
 public slots:
+    void LoadAlembic();
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
@@ -53,6 +66,10 @@ private:
     void initializeDemoTriangle();
     void renderDemoTriangle();
     void cleanDemoTriangle();
+    void initializeAlembicModel();
+    void RecursiveTraverseGetPolyMesh(const IObject &_object, int _tab, int _depth, IPolyMesh &_outputMesh);
+    void renderAlembicModel();
+    void cleanAlembicModel();
 
     int m_xRot;
     int m_yRot;
@@ -80,6 +97,10 @@ private:
     QOpenGLBuffer m_vbo;
     glm::vec3 m_colour;
     int m_colourLoc;
+
+    std::vector<QOpenGLVertexArrayObject*> m_vaos;
+    std::vector<QOpenGLBuffer*> m_vbos;
+    std::vector<glm::vec3> m_meshVerts;
 
 
 };

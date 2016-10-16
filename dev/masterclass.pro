@@ -30,5 +30,6 @@ INCLUDEPATH +=	./include                       \
 # libs required for boost and openvdb
 LIBS +=	-L/home/idris/dev/lib -lBulletDynamics -lBulletCollision -lLinearMath \
         -L/usr/local/lib -L/usr/lib/x86_64/ -lopenvdb -lpthread -lHalf -ltbb \
-        -lHalf -lAlembic -lImath -lIex -lIexMath -lIlmThread -pthread -lhdf5_serial
+        -lHalf -lAlembic -lImath -lIex -lIexMath -lIlmThread -pthread -lhdf5_serial \
+        -L/usr/lib -lGL -lGLU -lGLEW
 

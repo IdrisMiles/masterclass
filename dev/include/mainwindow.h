@@ -9,17 +9,12 @@
 #include <bullet/btBulletDynamicsCommon.h>
 #include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
-// Alembic includes
-#include "Alembic/AbcGeom/All.h"
-#include "Alembic/AbcCoreAbstract/All.h"
-#include "Alembic/AbcCoreHDF5/All.h"
-#include "Alembic/Abc/ErrorHandler.h"
-
 // Qt includes
 #include <QMainWindow>
 
 // QtOpengl include
 #include "openglscene.h"
+
 
 
 namespace Ui {

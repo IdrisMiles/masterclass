@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_OpenGLScene_t {
-    QByteArrayData data[19];
-    char stringdata0[231];
+    QByteArrayData data[20];
+    char stringdata0[243];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -41,21 +41,23 @@ QT_MOC_LITERAL(8, 92, 19), // "yTranslationChanged"
 QT_MOC_LITERAL(9, 112, 1), // "y"
 QT_MOC_LITERAL(10, 114, 19), // "zTranslationChanged"
 QT_MOC_LITERAL(11, 134, 1), // "z"
-QT_MOC_LITERAL(12, 136, 12), // "setXRotation"
-QT_MOC_LITERAL(13, 149, 12), // "setYRotation"
-QT_MOC_LITERAL(14, 162, 12), // "setZRotation"
-QT_MOC_LITERAL(15, 175, 15), // "setXTranslation"
-QT_MOC_LITERAL(16, 191, 15), // "setYTranslation"
-QT_MOC_LITERAL(17, 207, 15), // "setZTranslation"
-QT_MOC_LITERAL(18, 223, 7) // "cleanup"
+QT_MOC_LITERAL(12, 136, 11), // "LoadAlembic"
+QT_MOC_LITERAL(13, 148, 12), // "setXRotation"
+QT_MOC_LITERAL(14, 161, 12), // "setYRotation"
+QT_MOC_LITERAL(15, 174, 12), // "setZRotation"
+QT_MOC_LITERAL(16, 187, 15), // "setXTranslation"
+QT_MOC_LITERAL(17, 203, 15), // "setYTranslation"
+QT_MOC_LITERAL(18, 219, 15), // "setZTranslation"
+QT_MOC_LITERAL(19, 235, 7) // "cleanup"
 
     },
     "OpenGLScene\0xRotationChanged\0\0angle\0"
     "yRotationChanged\0zRotationChanged\0"
     "xTranslationChanged\0x\0yTranslationChanged\0"
-    "y\0zTranslationChanged\0z\0setXRotation\0"
-    "setYRotation\0setZRotation\0setXTranslation\0"
-    "setYTranslation\0setZTranslation\0cleanup"
+    "y\0zTranslationChanged\0z\0LoadAlembic\0"
+    "setXRotation\0setYRotation\0setZRotation\0"
+    "setXTranslation\0setYTranslation\0"
+    "setZTranslation\0cleanup"
 };
 #undef QT_MOC_LITERAL
 
@@ -65,7 +67,7 @@ static const uint qt_meta_data_OpenGLScene[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -73,21 +75,22 @@ static const uint qt_meta_data_OpenGLScene[] = {
        6,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   79,    2, 0x06 /* Public */,
-       4,    1,   82,    2, 0x06 /* Public */,
-       5,    1,   85,    2, 0x06 /* Public */,
-       6,    1,   88,    2, 0x06 /* Public */,
-       8,    1,   91,    2, 0x06 /* Public */,
-      10,    1,   94,    2, 0x06 /* Public */,
+       1,    1,   84,    2, 0x06 /* Public */,
+       4,    1,   87,    2, 0x06 /* Public */,
+       5,    1,   90,    2, 0x06 /* Public */,
+       6,    1,   93,    2, 0x06 /* Public */,
+       8,    1,   96,    2, 0x06 /* Public */,
+      10,    1,   99,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      12,    1,   97,    2, 0x0a /* Public */,
-      13,    1,  100,    2, 0x0a /* Public */,
-      14,    1,  103,    2, 0x0a /* Public */,
-      15,    1,  106,    2, 0x0a /* Public */,
-      16,    1,  109,    2, 0x0a /* Public */,
-      17,    1,  112,    2, 0x0a /* Public */,
-      18,    0,  115,    2, 0x0a /* Public */,
+      12,    0,  102,    2, 0x0a /* Public */,
+      13,    1,  103,    2, 0x0a /* Public */,
+      14,    1,  106,    2, 0x0a /* Public */,
+      15,    1,  109,    2, 0x0a /* Public */,
+      16,    1,  112,    2, 0x0a /* Public */,
+      17,    1,  115,    2, 0x0a /* Public */,
+      18,    1,  118,    2, 0x0a /* Public */,
+      19,    0,  121,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int,    3,
@@ -98,6 +101,7 @@ static const uint qt_meta_data_OpenGLScene[] = {
     QMetaType::Void, QMetaType::Int,   11,
 
  // slots: parameters
+    QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::Int,    3,
@@ -121,13 +125,14 @@ void OpenGLScene::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 3: _t->xTranslationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 4: _t->yTranslationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: _t->zTranslationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->setXRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 7: _t->setYRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 8: _t->setZRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 9: _t->setXTranslation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 10: _t->setYTranslation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 11: _t->setZTranslation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 12: _t->cleanup(); break;
+        case 6: _t->LoadAlembic(); break;
+        case 7: _t->setXRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: _t->setYRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: _t->setZRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->setXTranslation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 11: _t->setYTranslation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 12: _t->setZTranslation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 13: _t->cleanup(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -194,8 +199,6 @@ void *OpenGLScene::qt_metacast(const char *_clname)
     if (!_clname) return Q_NULLPTR;
     if (!strcmp(_clname, qt_meta_stringdata_OpenGLScene.stringdata0))
         return static_cast<void*>(const_cast< OpenGLScene*>(this));
-    if (!strcmp(_clname, "QOpenGLFunctions"))
-        return static_cast< QOpenGLFunctions*>(const_cast< OpenGLScene*>(this));
     return QOpenGLWidget::qt_metacast(_clname);
 }
 
@@ -205,13 +208,13 @@ int OpenGLScene::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 13;
+        _id -= 14;
     }
     return _id;
 }

@@ -1,7 +1,11 @@
 #include "include/openglscene.h"
+
 #include <iostream>
+
 #include <QMouseEvent>
-#include <math.h>
+#include <QOpenGLContext>
+#include <QFileDialog>
+
 
 OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     m_xRot(0),
@@ -17,6 +21,10 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     format.setStencilBufferSize(8);
 
     setFormat(format);
+
+    m_vaos.clear();
+    m_vbos.clear();
+    m_meshVerts.clear();
 }
 
 
@@ -43,6 +51,163 @@ static void qNormalizeAngle(int &angle)
     while (angle > 360 * 16)
         angle -= 360 * 16;
 }
+
+
+void OpenGLScene::RecursiveTraverseGetPolyMesh(const IObject &_object, int _tab, int _depth, IPolyMesh &_outputMesh)
+{
+    // Handle depth limit
+    if (_depth < 1)
+    {
+        return;
+    }
+
+    // print tabs
+    for(int i=0;i<_tab;i++)
+    {
+        std::cout<<"---";
+    }
+
+    unsigned int numChildren = _object.getNumChildren();
+    std::cout<<_object.getName()<<" has "<<numChildren<<" child element/s"<<std::endl;
+
+    for (unsigned int i=0; i<numChildren; i++)
+    {
+        const MetaData childMD = _object.getChild(i).getMetaData();
+        if(IPolyMeshSchema::matches(childMD))
+        {
+            // This node is a mesh node
+            IPolyMesh mesh(_object,_object.getChild(i).getName());
+            _outputMesh = mesh;
+            return;
+        }
+        else
+        {
+            // Keep searching
+            RecursiveTraverseGetPolyMesh(_object.getChild(i), _tab + 1, _depth - 1, _outputMesh);
+        }
+    }
+
+}
+
+void OpenGLScene::LoadAlembic()
+{
+    QString file = QFileDialog::getOpenFileName(this,QString("Open File"), QString("./"), QString("Alembic files (*.abc)"));
+
+    if (file.isNull())
+    {
+        return;
+    }
+
+    std::cout<<"Attempting to open alembic file: "<<file.toStdString()<<std::endl;
+    try
+    {
+    IArchive iArchive(Alembic::AbcCoreHDF5::ReadArchive(), file.toStdString());
+
+    IObject topObj = iArchive.getTop();
+    std::cout<<topObj.getName()<<std::endl;
+
+    IPolyMesh mesh;
+
+    RecursiveTraverseGetPolyMesh(topObj, 0, 8, mesh);
+
+
+    IPolyMeshSchema meshSchema = mesh.getSchema();
+    IPolyMeshSchema::Sample meshSample;
+    meshSchema.get(meshSample);
+    uint32_t numPoints = meshSample.getPositions()->size();
+/*
+    IXform x( child, kWrapExisting );
+    XformSample xs;
+    x.getSchema().get( xs );
+    M44d mat=xs.getMatrix();
+*/
+    for(uint32_t i=0;i<numPoints;i++)
+    {
+        Imath::V3f p = meshSample.getPositions()->get()[i];
+        //Imath::V3f n = meshSchema.getNormalsParam().get;
+        m_meshVerts.push_back(glm::vec3(p.x, p.y, p.z));
+        m_meshVerts.push_back(glm::vec3(0.0f,0.0f,1.0f));
+
+        std::cout<<p.x<<", "<<p.y<<", "<<p.z<<"\n";
+    }
+
+    }
+    catch (std::exception e)
+    {
+        std::cout<<e.what()<<std::endl;
+    }
+
+    initializeAlembicModel();
+
+}
+
+void OpenGLScene::initializeAlembicModel()
+{
+
+    // Qt SLOTS not necessarrily in main thread, need to get graphics context
+    makeCurrent();
+
+    m_shaderProg->bind();
+    m_vaos.push_back( new QOpenGLVertexArrayObject() );
+
+    m_colour = glm::vec3(0.8f, 0.4f, 0.4f);
+    m_colourLoc = m_shaderProg->uniformLocation("colour");
+    glUniform3fv(m_colourLoc, 1, &m_colour[0]);
+
+    m_vaos.back()->create();
+    m_vaos.back()->bind();
+
+
+    // Setup our vertex buffer object.
+    m_vbos.push_back(new QOpenGLBuffer());
+    m_vbos.back()->create();
+    m_vbos.back()->bind();
+    m_vbos.back()->allocate(&m_meshVerts[0], m_meshVerts.size() * sizeof(glm::vec3));
+
+    glEnableVertexAttribArray( 0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+
+    m_vbos.back()->release();
+    m_vaos.back()->release();
+
+    m_shaderProg->release();
+
+    doneCurrent();
+    update();
+
+}
+
+void OpenGLScene::renderAlembicModel()
+{
+
+    for(auto vao : m_vaos)
+    {
+        vao->bind();
+        glDrawArrays(GL_TRIANGLES, 0, m_meshVerts.size());
+        vao->release();
+    }
+
+}
+
+
+void OpenGLScene::cleanAlembicModel()
+{
+    for(auto vao : m_vaos)
+    {
+        vao->destroy();
+    }
+    for(auto vbo : m_vbos)
+    {
+        vbo->destroy();
+    }
+
+    m_vaos.clear();
+    m_vbos.clear();
+}
+
+
 
 void OpenGLScene::setXTranslation(int x)
 {
@@ -108,6 +273,7 @@ void OpenGLScene::cleanup()
 {
     makeCurrent();
     cleanDemoTriangle();
+    cleanAlembicModel();
     delete m_shaderProg;
     m_shaderProg = 0;
     doneCurrent();
@@ -123,8 +289,9 @@ void OpenGLScene::cleanDemoTriangle()
 void OpenGLScene::initializeGL()
 {
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &OpenGLScene::cleanup);
+    glewInit();
 
-    initializeOpenGLFunctions();
+
     glClearColor(0.4, 0.4, 0.4, 1);
 
     // setup shaders
@@ -153,7 +320,8 @@ void OpenGLScene::initializeGL()
 
     //---------------------------------------------------------------------------------------
     // Demo triangle - replace this per project
-    initializeDemoTriangle();
+    //initializeDemoTriangle();
+    //initializeAlembicModel();
     //---------------------------------------------------------------------------------------
 
 
@@ -227,7 +395,8 @@ void OpenGLScene::paintGL()
 
     //---------------------------------------------------------------------------------------
     // Draw code - replace this with project specific draw stuff
-    renderDemoTriangle();
+    //renderDemoTriangle();
+    renderAlembicModel();
     //---------------------------------------------------------------------------------------
 
 
