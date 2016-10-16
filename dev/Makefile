@@ -50,11 +50,13 @@ OBJECTS_DIR   = obj/
 
 SOURCES       = src/main.cpp \
 		src/mainwindow.cpp \
-		src/openglscene.cpp moc/moc_mainwindow.cpp \
+		src/openglscene.cpp \
+		src/rendermesh.cpp moc/moc_mainwindow.cpp \
 		moc/moc_openglscene.cpp
 OBJECTS       = obj/main.o \
 		obj/mainwindow.o \
 		obj/openglscene.o \
+		obj/rendermesh.o \
 		obj/moc_mainwindow.o \
 		obj/moc_openglscene.o
 DIST          = ../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
@@ -207,9 +209,11 @@ DIST          = ../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/yacc.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/lex.prf \
 		masterclass.pro include/mainwindow.h \
-		include/openglscene.h src/main.cpp \
+		include/openglscene.h \
+		include/rendermesh.h src/main.cpp \
 		src/mainwindow.cpp \
-		src/openglscene.cpp
+		src/openglscene.cpp \
+		src/rendermesh.cpp
 QMAKE_TARGET  = masterclass
 DESTDIR       = bin/
 TARGET        = bin/masterclass
@@ -543,8 +547,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents include/mainwindow.h include/openglscene.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/openglscene.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/mainwindow.h include/openglscene.h include/rendermesh.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/openglscene.cpp src/rendermesh.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ui/mainwindow.ui $(DISTDIR)/
 
 
@@ -1559,8 +1563,16 @@ obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLContext \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/openglscene.o src/openglscene.cpp
+
+obj/rendermesh.o: src/rendermesh.cpp include/rendermesh.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/rendermesh.o src/rendermesh.cpp
 
 obj/moc_mainwindow.o: moc/moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_mainwindow.o moc/moc_mainwindow.cpp

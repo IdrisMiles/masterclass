@@ -61,15 +61,8 @@ void OpenGLScene::RecursiveTraverseGetPolyMesh(const IObject &_object, int _tab,
         return;
     }
 
-    // print tabs
-    for(int i=0;i<_tab;i++)
-    {
-        std::cout<<"---";
-    }
 
     unsigned int numChildren = _object.getNumChildren();
-    std::cout<<_object.getName()<<" has "<<numChildren<<" child element/s"<<std::endl;
-
     for (unsigned int i=0; i<numChildren; i++)
     {
         const MetaData childMD = _object.getChild(i).getMetaData();
@@ -98,50 +91,57 @@ void OpenGLScene::LoadAlembic()
         return;
     }
 
-    std::cout<<"Attempting to open alembic file: "<<file.toStdString()<<std::endl;
-    try
-    {
+
+    // Open the alembic arrchive
     IArchive iArchive(Alembic::AbcCoreHDF5::ReadArchive(), file.toStdString());
-
     IObject topObj = iArchive.getTop();
-    std::cout<<topObj.getName()<<std::endl;
 
+
+    // Get the mesh within the alembic archive
     IPolyMesh mesh;
-
     RecursiveTraverseGetPolyMesh(topObj, 0, 8, mesh);
 
 
+    // Get the mesh schema and samples for the mesh we found
     IPolyMeshSchema meshSchema = mesh.getSchema();
     IPolyMeshSchema::Sample meshSample;
     meshSchema.get(meshSample);
-    uint32_t numPoints = meshSample.getPositions()->size();
+
+
+    // Get index array for mesh
+    uint32_t numIndices = meshSample.getFaceIndices()->size();
+    for (uint32_t i=0;i<numIndices;i++)
+    {
+        m_meshElementIndex.push_back((int)meshSample.getFaceIndices()->get()[i]);
+    }
+
+
 /*
     IXform x( child, kWrapExisting );
     XformSample xs;
     x.getSchema().get( xs );
     M44d mat=xs.getMatrix();
 */
+
+    // Get mesh vertex positions and normals
+    IN3fGeomParam normals = meshSchema.getNormalsParam();
+    uint32_t numPoints = meshSample.getPositions()->size();
     for(uint32_t i=0;i<numPoints;i++)
     {
         Imath::V3f p = meshSample.getPositions()->get()[i];
-        //Imath::V3f n = meshSchema.getNormalsParam().get;
+        N3f n = normals.getIndexedValue().getVals()->get()[i];
+
         m_meshVerts.push_back(glm::vec3(p.x, p.y, p.z));
-        m_meshVerts.push_back(glm::vec3(0.0f,0.0f,1.0f));
-
-        std::cout<<p.x<<", "<<p.y<<", "<<p.z<<"\n";
-    }
+        m_meshVerts.push_back(glm::vec3(n.x, n.y, n.z));
 
     }
-    catch (std::exception e)
-    {
-        std::cout<<e.what()<<std::endl;
-    }
 
-    initializeAlembicModel();
+
+    initializeAlembicModelVAO();
 
 }
 
-void OpenGLScene::initializeAlembicModel()
+void OpenGLScene::initializeAlembicModelVAO()
 {
 
     // Qt SLOTS not necessarrily in main thread, need to get graphics context
@@ -157,17 +157,23 @@ void OpenGLScene::initializeAlembicModel()
     m_vaos.back()->create();
     m_vaos.back()->bind();
 
+    m_ibos.push_back(new QOpenGLBuffer(QOpenGLBuffer::IndexBuffer));
+    m_ibos.back()->create();
+    m_ibos.back()->bind();
+    m_ibos.back()->allocate(&m_meshElementIndex[0], m_meshElementIndex.size() * sizeof(int));
+    m_ibos.back()->release();
+
 
     // Setup our vertex buffer object.
-    m_vbos.push_back(new QOpenGLBuffer());
+    m_vbos.push_back(new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer));
     m_vbos.back()->create();
     m_vbos.back()->bind();
     m_vbos.back()->allocate(&m_meshVerts[0], m_meshVerts.size() * sizeof(glm::vec3));
 
     glEnableVertexAttribArray( 0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), reinterpret_cast<void *>(1 * sizeof(glm::vec3)));
 
     m_vbos.back()->release();
     m_vaos.back()->release();
@@ -185,7 +191,8 @@ void OpenGLScene::renderAlembicModel()
     for(auto vao : m_vaos)
     {
         vao->bind();
-        glDrawArrays(GL_TRIANGLES, 0, m_meshVerts.size());
+        //glDrawArrays(GL_TRIANGLES, 0, m_meshVerts.size()/3);
+        glDrawElements(GL_TRIANGLES, m_meshElementIndex.size(), GL_UNSIGNED_INT, &m_meshElementIndex[0]);
         vao->release();
     }
 

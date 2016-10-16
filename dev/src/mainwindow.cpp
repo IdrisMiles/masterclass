@@ -59,16 +59,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create();
 
-    std::cout<<"Testing random access:\n";
-
     openvdb::FloatGrid::Accessor accessor = grid->getAccessor();
 
     openvdb::Coord coord(10000, -20000000, 3000000);
 
     accessor.setValue(coord, 1.0);
-
-    std::cout<<"Grid "<< coord <<" = "<< accessor.getValue(coord)<<std::endl;
-
 
 
 
@@ -81,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
         btTransform sphereTrans;
         sphereRB->getMotionState()->getWorldTransform(sphereTrans);
 
-        std::cout<<"Sphere Y position:\t"<<sphereTrans.getOrigin().y()<<"\n";
     }
 
 

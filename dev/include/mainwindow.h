@@ -4,6 +4,7 @@
 
 // OpenVDB includes
 #include <openvdb/openvdb.h>
+#include <openvdb/tools/MeshToVolume.h>
 
 // Bullets includes
 #include <bullet/btBulletDynamicsCommon.h>

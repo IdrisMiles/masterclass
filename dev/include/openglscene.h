@@ -66,7 +66,7 @@ private:
     void initializeDemoTriangle();
     void renderDemoTriangle();
     void cleanDemoTriangle();
-    void initializeAlembicModel();
+    void initializeAlembicModelVAO();
     void RecursiveTraverseGetPolyMesh(const IObject &_object, int _tab, int _depth, IPolyMesh &_outputMesh);
     void renderAlembicModel();
     void cleanAlembicModel();
@@ -95,12 +95,16 @@ private:
     // Demo triangle specifics
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vbo;
+
     glm::vec3 m_colour;
     int m_colourLoc;
 
+public:
     std::vector<QOpenGLVertexArrayObject*> m_vaos;
     std::vector<QOpenGLBuffer*> m_vbos;
+    std::vector<QOpenGLBuffer*> m_ibos;
     std::vector<glm::vec3> m_meshVerts;
+    std::vector<unsigned int> m_meshElementIndex;
 
 
 };
