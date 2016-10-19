@@ -1,9 +1,9 @@
-#include "include/openglscene.h"
+#include "openglscene.h"
 
 #include <iostream>
 
-#include <QMouseEvent>
 #include <QOpenGLContext>
+#include <QMouseEvent>
 #include <QFileDialog>
 
 
@@ -22,9 +22,9 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
 
     setFormat(format);
 
-    m_vaos.clear();
-    m_vbos.clear();
-    m_meshVerts.clear();
+
+    m_physicsBodies.clear();
+    initializePhysicsWorld();
 }
 
 
@@ -33,6 +33,7 @@ OpenGLScene::~OpenGLScene()
     cleanup();
 }
 
+//--------------------------------------------------------------------------------------------------
 
 QSize OpenGLScene::minimumSizeHint() const
 {
@@ -51,170 +52,6 @@ static void qNormalizeAngle(int &angle)
     while (angle > 360 * 16)
         angle -= 360 * 16;
 }
-
-
-void OpenGLScene::RecursiveTraverseGetPolyMesh(const IObject &_object, int _tab, int _depth, IPolyMesh &_outputMesh)
-{
-    // Handle depth limit
-    if (_depth < 1)
-    {
-        return;
-    }
-
-
-    unsigned int numChildren = _object.getNumChildren();
-    for (unsigned int i=0; i<numChildren; i++)
-    {
-        const MetaData childMD = _object.getChild(i).getMetaData();
-        if(IPolyMeshSchema::matches(childMD))
-        {
-            // This node is a mesh node
-            IPolyMesh mesh(_object,_object.getChild(i).getName());
-            _outputMesh = mesh;
-            return;
-        }
-        else
-        {
-            // Keep searching
-            RecursiveTraverseGetPolyMesh(_object.getChild(i), _tab + 1, _depth - 1, _outputMesh);
-        }
-    }
-
-}
-
-void OpenGLScene::LoadAlembic()
-{
-    QString file = QFileDialog::getOpenFileName(this,QString("Open File"), QString("./"), QString("Alembic files (*.abc)"));
-
-    if (file.isNull())
-    {
-        return;
-    }
-
-
-    // Open the alembic arrchive
-    IArchive iArchive(Alembic::AbcCoreHDF5::ReadArchive(), file.toStdString());
-    IObject topObj = iArchive.getTop();
-
-
-    // Get the mesh within the alembic archive
-    IPolyMesh mesh;
-    RecursiveTraverseGetPolyMesh(topObj, 0, 8, mesh);
-
-
-    // Get the mesh schema and samples for the mesh we found
-    IPolyMeshSchema meshSchema = mesh.getSchema();
-    IPolyMeshSchema::Sample meshSample;
-    meshSchema.get(meshSample);
-
-
-    // Get index array for mesh
-    uint32_t numIndices = meshSample.getFaceIndices()->size();
-    for (uint32_t i=0;i<numIndices;i++)
-    {
-        m_meshElementIndex.push_back((int)meshSample.getFaceIndices()->get()[i]);
-    }
-
-
-/*
-    IXform x( child, kWrapExisting );
-    XformSample xs;
-    x.getSchema().get( xs );
-    M44d mat=xs.getMatrix();
-*/
-
-    // Get mesh vertex positions and normals
-    IN3fGeomParam normals = meshSchema.getNormalsParam();
-    uint32_t numPoints = meshSample.getPositions()->size();
-    for(uint32_t i=0;i<numPoints;i++)
-    {
-        Imath::V3f p = meshSample.getPositions()->get()[i];
-        N3f n = normals.getIndexedValue().getVals()->get()[i];
-
-        m_meshVerts.push_back(glm::vec3(p.x, p.y, p.z));
-        m_meshVerts.push_back(glm::vec3(n.x, n.y, n.z));
-
-    }
-
-
-    initializeAlembicModelVAO();
-
-}
-
-void OpenGLScene::initializeAlembicModelVAO()
-{
-
-    // Qt SLOTS not necessarrily in main thread, need to get graphics context
-    makeCurrent();
-
-    m_shaderProg->bind();
-    m_vaos.push_back( new QOpenGLVertexArrayObject() );
-
-    m_colour = glm::vec3(0.8f, 0.4f, 0.4f);
-    m_colourLoc = m_shaderProg->uniformLocation("colour");
-    glUniform3fv(m_colourLoc, 1, &m_colour[0]);
-
-    m_vaos.back()->create();
-    m_vaos.back()->bind();
-
-    m_ibos.push_back(new QOpenGLBuffer(QOpenGLBuffer::IndexBuffer));
-    m_ibos.back()->create();
-    m_ibos.back()->bind();
-    m_ibos.back()->allocate(&m_meshElementIndex[0], m_meshElementIndex.size() * sizeof(int));
-    m_ibos.back()->release();
-
-
-    // Setup our vertex buffer object.
-    m_vbos.push_back(new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer));
-    m_vbos.back()->create();
-    m_vbos.back()->bind();
-    m_vbos.back()->allocate(&m_meshVerts[0], m_meshVerts.size() * sizeof(glm::vec3));
-
-    glEnableVertexAttribArray( 0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), reinterpret_cast<void *>(1 * sizeof(glm::vec3)));
-
-    m_vbos.back()->release();
-    m_vaos.back()->release();
-
-    m_shaderProg->release();
-
-    doneCurrent();
-    update();
-
-}
-
-void OpenGLScene::renderAlembicModel()
-{
-
-    for(auto vao : m_vaos)
-    {
-        vao->bind();
-        //glDrawArrays(GL_TRIANGLES, 0, m_meshVerts.size()/3);
-        glDrawElements(GL_TRIANGLES, m_meshElementIndex.size(), GL_UNSIGNED_INT, &m_meshElementIndex[0]);
-        vao->release();
-    }
-
-}
-
-
-void OpenGLScene::cleanAlembicModel()
-{
-    for(auto vao : m_vaos)
-    {
-        vao->destroy();
-    }
-    for(auto vbo : m_vbos)
-    {
-        vbo->destroy();
-    }
-
-    m_vaos.clear();
-    m_vbos.clear();
-}
-
-
 
 void OpenGLScene::setXTranslation(int x)
 {
@@ -276,11 +113,15 @@ void OpenGLScene::setZRotation(int angle)
     }
 }
 
+
+//--------------------------------------------------------------------------------------------------
+// Cleanup methods
+
 void OpenGLScene::cleanup()
 {
     makeCurrent();
+    cleanPhysicsWorld();
     cleanDemoTriangle();
-    cleanAlembicModel();
     delete m_shaderProg;
     m_shaderProg = 0;
     doneCurrent();
@@ -290,6 +131,82 @@ void OpenGLScene::cleanDemoTriangle()
 {
     m_vbo.destroy();
     m_vao.destroy();
+}
+
+void OpenGLScene::cleanPhysicsWorld()
+{
+    // empty physics world
+    m_dynamicWorld->removeRigidBody(m_groundRB);
+
+    // clean physics bodies
+    for(auto&& bodies : m_physicsBodies)
+    {
+        delete bodies;
+    }
+    m_physicsBodies.clear();
+
+
+    // free physics memory
+    delete m_groundRB;
+    delete m_groundMotionState;
+    delete m_groundShape;
+
+    delete m_dynamicWorld;
+    delete m_solver;
+    delete m_collisionDispatcher;
+    delete m_collisionConfig;
+    delete m_broadPhase;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+// Initialization and loading methods
+
+void OpenGLScene::loadMesh()
+{
+    QString file = QFileDialog::getOpenFileName(this,QString("Open File"), QString("./"), QString("Alembic files (*.abc)"));
+
+    if (file.isNull())
+    {
+        return;
+    }
+
+    makeCurrent();
+    m_physicsBodies.push_back(new PhysicsBody());
+    m_physicsBodies.back()->LoadMesh(file.toStdString(), m_shaderProg);
+    doneCurrent();
+    update();
+}
+
+void OpenGLScene::initializePhysicsWorld()
+{
+    //----------------------------------
+    // Boilerplate bullet initialisation
+    m_broadPhase = new btDbvtBroadphase();
+
+    m_collisionConfig = new btDefaultCollisionConfiguration();
+    m_collisionDispatcher = new btCollisionDispatcher(m_collisionConfig);
+
+    btGImpactCollisionAlgorithm::registerAlgorithm(m_collisionDispatcher);
+
+    m_solver = new btSequentialImpulseConstraintSolver();
+
+    // initialise the dynamic world
+    m_dynamicWorld = new btDiscreteDynamicsWorld(m_collisionDispatcher, m_broadPhase, m_solver, m_collisionConfig);
+    m_dynamicWorld->setGravity(btVector3(0.0f,-10.0f,0.0f));
+
+
+    //-------------------------------
+    // Setting up dynamic rigidbodies
+
+    // collision shapes
+    m_groundShape = new btStaticPlaneShape(btVector3(0.0f,1.0f,0.0f),1.0f);
+
+    // ground rigid body setup
+    m_groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
+    btRigidBody::btRigidBodyConstructionInfo groundRBCI(0.0f, m_groundMotionState, m_groundShape, btVector3(0,0,0));
+    m_groundRB = new btRigidBody(groundRBCI);
+    m_dynamicWorld->addRigidBody(m_groundRB);
 }
 
 
@@ -368,6 +285,10 @@ void OpenGLScene::initializeDemoTriangle()
     m_vao.release();
 }
 
+
+//--------------------------------------------------------------------------------------------------
+// Render methods
+
 void OpenGLScene::renderDemoTriangle()
 {
     m_vao.bind();
@@ -403,19 +324,26 @@ void OpenGLScene::paintGL()
     //---------------------------------------------------------------------------------------
     // Draw code - replace this with project specific draw stuff
     //renderDemoTriangle();
-    renderAlembicModel();
+
+    for(auto&& body : m_physicsBodies)
+    {
+        body->DrawMesh();
+        body->DrawSpheres();
+    }
     //---------------------------------------------------------------------------------------
 
 
     m_shaderProg->release();
 }
 
+
+//--------------------------------------------------------------------------------------------------
+// Qt methods
+
 void OpenGLScene::resizeGL(int w, int h)
 {
     m_projMat = glm::perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
 }
-
-
 
 void OpenGLScene::mousePressEvent(QMouseEvent *event)
 {

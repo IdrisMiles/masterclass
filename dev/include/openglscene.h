@@ -2,28 +2,24 @@
 #define OPENGLSCENE_H
 
 
-#include <GL/glew.h>
+#include "physicsbody.h"
 
+// Open GL and Qt includes
+#include <GL/glew.h>
 #include <QOpenGLWidget>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 
+// GLM includes
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
+// Bullets includes
+#include <bullet/btBulletDynamicsCommon.h>
+#include <bullet/btBulletCollisionCommon.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
-
-// Alembic includes
-#include "Alembic/AbcGeom/All.h"
-#include "Alembic/AbcCoreAbstract/All.h"
-#include "Alembic/AbcCoreHDF5/All.h"
-#include "Alembic/Abc/ErrorHandler.h"
-
-
-
-using namespace Alembic::Abc;
-using namespace Alembic::AbcGeom;
 
 class OpenGLScene : public QOpenGLWidget
 {
@@ -38,7 +34,7 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
 public slots:
-    void LoadAlembic();
+    void loadMesh();
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
@@ -66,10 +62,11 @@ private:
     void initializeDemoTriangle();
     void renderDemoTriangle();
     void cleanDemoTriangle();
-    void initializeAlembicModelVAO();
-    void RecursiveTraverseGetPolyMesh(const IObject &_object, int _tab, int _depth, IPolyMesh &_outputMesh);
-    void renderAlembicModel();
-    void cleanAlembicModel();
+
+    void initializePhysicsWorld();
+    void cleanPhysicsWorld();
+
+
 
     int m_xRot;
     int m_yRot;
@@ -96,15 +93,21 @@ private:
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vbo;
 
+    // Bullet physics stuff
+    btBroadphaseInterface *m_broadPhase;
+    btDefaultCollisionConfiguration *m_collisionConfig;
+    btCollisionDispatcher *m_collisionDispatcher;
+    btSequentialImpulseConstraintSolver *m_solver;
+    btDiscreteDynamicsWorld *m_dynamicWorld;
+    btCollisionShape *m_groundShape;
+    btDefaultMotionState *m_groundMotionState;
+    btRigidBody *m_groundRB;
+    std::vector<PhysicsBody*> m_physicsBodies;
+
     glm::vec3 m_colour;
     int m_colourLoc;
 
 public:
-    std::vector<QOpenGLVertexArrayObject*> m_vaos;
-    std::vector<QOpenGLBuffer*> m_vbos;
-    std::vector<QOpenGLBuffer*> m_ibos;
-    std::vector<glm::vec3> m_meshVerts;
-    std::vector<unsigned int> m_meshElementIndex;
 
 
 };

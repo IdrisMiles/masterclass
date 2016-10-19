@@ -51,12 +51,12 @@ OBJECTS_DIR   = obj/
 SOURCES       = src/main.cpp \
 		src/mainwindow.cpp \
 		src/openglscene.cpp \
-		src/rendermesh.cpp moc/moc_mainwindow.cpp \
+		src/physicsbody.cpp moc/moc_mainwindow.cpp \
 		moc/moc_openglscene.cpp
 OBJECTS       = obj/main.o \
 		obj/mainwindow.o \
 		obj/openglscene.o \
-		obj/rendermesh.o \
+		obj/physicsbody.o \
 		obj/moc_mainwindow.o \
 		obj/moc_openglscene.o
 DIST          = ../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
@@ -210,10 +210,10 @@ DIST          = ../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt5.7.0/5.7/gcc_64/mkspecs/features/lex.prf \
 		masterclass.pro include/mainwindow.h \
 		include/openglscene.h \
-		include/rendermesh.h src/main.cpp \
+		include/physicsbody.h src/main.cpp \
 		src/mainwindow.cpp \
 		src/openglscene.cpp \
-		src/rendermesh.cpp
+		src/physicsbody.cpp
 QMAKE_TARGET  = masterclass
 DESTDIR       = bin/
 TARGET        = bin/masterclass
@@ -547,8 +547,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents include/mainwindow.h include/openglscene.h include/rendermesh.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/openglscene.cpp src/rendermesh.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/mainwindow.h include/openglscene.h include/physicsbody.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/openglscene.cpp src/physicsbody.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ui/mainwindow.ui $(DISTDIR)/
 
 
@@ -578,120 +578,7 @@ compiler_rcc_clean:
 compiler_moc_header_make_all: moc/moc_mainwindow.cpp moc/moc_openglscene.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc/moc_mainwindow.cpp moc/moc_openglscene.cpp
-moc/moc_mainwindow.cpp: ../../../../dev/include/bullet/btBulletDynamicsCommon.h \
-		../../../../dev/include/bullet/btBulletCollisionCommon.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
-		../../../../dev/include/bullet/LinearMath/btVector3.h \
-		../../../../dev/include/bullet/LinearMath/btScalar.h \
-		../../../../dev/include/bullet/LinearMath/btMinMax.h \
-		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
-		../../../../dev/include/bullet/LinearMath/btTransform.h \
-		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
-		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
-		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
-		../../../../dev/include/bullet/LinearMath/btMotionState.h \
-		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
-		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
-		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
-		../../../../dev/include/bullet/LinearMath/btHashMap.h \
-		../../../../dev/include/bullet/LinearMath/btSerializer.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
-		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
-		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
-		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
-		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
+moc/moc_mainwindow.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs.h \
@@ -792,6 +679,7 @@ moc/moc_mainwindow.cpp: ../../../../dev/include/bullet/btBulletDynamicsCommon.h 
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qicon.h \
 		include/openglscene.h \
+		include/physicsbody.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qopenglwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QWidget \
@@ -813,11 +701,110 @@ moc/moc_mainwindow.cpp: ../../../../dev/include/bullet/btBulletDynamicsCommon.h 
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
 		include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/bin/moc
 	/home/idris/Qt5.7.0/5.7/gcc_64/bin/moc $(DEFINES) -I/home/idris/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++ -I/home/idris/uni/masterclass/masterclass/dev -I/home/idris/uni/masterclass/masterclass/dev/include -I/home/idris/dev/include -I/home/idris/dev/include/bullet -I/usr/include/openvdb -I/usr/local/include/OpenEXR -I/usr/local/include/Alembic -I/home/idris/Qt5.7.0/5.7/gcc_64/include -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtWidgets -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtGui -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/mainwindow.h -o moc/moc_mainwindow.cpp
 
-moc/moc_openglscene.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
+moc/moc_openglscene.cpp: include/physicsbody.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qopenglwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobal.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qconfig.h \
@@ -934,6 +921,104 @@ moc/moc_openglscene.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenG
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
 		include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/bin/moc
 	/home/idris/Qt5.7.0/5.7/gcc_64/bin/moc $(DEFINES) -I/home/idris/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++ -I/home/idris/uni/masterclass/masterclass/dev -I/home/idris/uni/masterclass/masterclass/dev/include -I/home/idris/dev/include -I/home/idris/dev/include/bullet -I/usr/include/openvdb -I/usr/local/include/OpenEXR -I/usr/local/include/Alembic -I/home/idris/Qt5.7.0/5.7/gcc_64/include -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtWidgets -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtGui -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/openglscene.h -o moc/moc_openglscene.cpp
@@ -958,119 +1043,6 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 ####### Compile
 
 obj/main.o: src/main.cpp include/mainwindow.h \
-		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
-		../../../../dev/include/bullet/btBulletCollisionCommon.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
-		../../../../dev/include/bullet/LinearMath/btVector3.h \
-		../../../../dev/include/bullet/LinearMath/btScalar.h \
-		../../../../dev/include/bullet/LinearMath/btMinMax.h \
-		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
-		../../../../dev/include/bullet/LinearMath/btTransform.h \
-		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
-		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
-		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
-		../../../../dev/include/bullet/LinearMath/btMotionState.h \
-		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
-		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
-		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
-		../../../../dev/include/bullet/LinearMath/btHashMap.h \
-		../../../../dev/include/bullet/LinearMath/btSerializer.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
-		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
-		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
-		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
-		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
@@ -1172,6 +1144,7 @@ obj/main.o: src/main.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qicon.h \
 		include/openglscene.h \
+		include/physicsbody.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qopenglwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QWidget \
@@ -1193,6 +1166,104 @@ obj/main.o: src/main.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QApplication \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qapplication.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1203,119 +1274,6 @@ obj/main.o: src/main.cpp include/mainwindow.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main.o src/main.cpp
 
 obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
-		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
-		../../../../dev/include/bullet/btBulletCollisionCommon.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
-		../../../../dev/include/bullet/LinearMath/btVector3.h \
-		../../../../dev/include/bullet/LinearMath/btScalar.h \
-		../../../../dev/include/bullet/LinearMath/btMinMax.h \
-		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
-		../../../../dev/include/bullet/LinearMath/btTransform.h \
-		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
-		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
-		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
-		../../../../dev/include/bullet/LinearMath/btMotionState.h \
-		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
-		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
-		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
-		../../../../dev/include/bullet/LinearMath/btHashMap.h \
-		../../../../dev/include/bullet/LinearMath/btSerializer.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
-		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
-		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
-		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
-		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
-		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
-		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
-		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
-		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
-		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
-		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
-		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWindow \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
@@ -1417,6 +1375,7 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qicon.h \
 		include/openglscene.h \
+		include/physicsbody.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qopenglwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QWidget \
@@ -1438,10 +1397,109 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
 		form/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/mainwindow.o src/mainwindow.cpp
 
 obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
+		include/physicsbody.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qopenglwidget.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobal.h \
@@ -1559,11 +1617,109 @@ obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
-		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QMouseEvent \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLContext \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglversionfunctions.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QMouseEvent \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QFileDialog \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qfiledialog.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdir.h \
@@ -1571,8 +1727,223 @@ obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/openglscene.o src/openglscene.cpp
 
-obj/rendermesh.o: src/rendermesh.cpp include/rendermesh.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/rendermesh.o src/rendermesh.cpp
+obj/physicsbody.o: src/physicsbody.cpp include/physicsbody.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QOpenGLWidget \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qopenglwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfeatures.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtypetraits.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qisenum.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qversiontagging.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qalgorithms.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiterator.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpair.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringlist.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qregexp.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmetatype.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qobject_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmargins.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qrect.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsize.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpalette.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcolor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgb.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qrgba64.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qbrush.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvector.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qmatrix.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpolygon.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qregion.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdatastream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qiodevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qline.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtransform.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpainterpath.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qimage.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixelformat.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qpixmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qshareddata.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qhash.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfont.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qfontinfo.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qcursor.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qkeysequence.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qevent.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qvariant.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qmap.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qdebug.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qtextstream.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qlocale.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qset.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qurlquery.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfile.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qfiledevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector2d.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QSurfaceFormat \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qsurfaceformat.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengl.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qt_windows.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopengles2ext.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglext.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLShaderProgram \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglshaderprogram.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector3d.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qvector4d.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qmatrix4x4.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qquaternion.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qgenericmatrix.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLVertexArrayObject \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglvertexarrayobject.h \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QObject \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLBuffer \
+		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglbuffer.h \
+		../../../../dev/include/bullet/btBulletDynamicsCommon.h \
+		../../../../dev/include/bullet/btBulletCollisionCommon.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+		../../../../dev/include/bullet/LinearMath/btVector3.h \
+		../../../../dev/include/bullet/LinearMath/btScalar.h \
+		../../../../dev/include/bullet/LinearMath/btMinMax.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedAllocator.h \
+		../../../../dev/include/bullet/LinearMath/btTransform.h \
+		../../../../dev/include/bullet/LinearMath/btMatrix3x3.h \
+		../../../../dev/include/bullet/LinearMath/btQuaternion.h \
+		../../../../dev/include/bullet/LinearMath/btQuadWord.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h \
+		../../../../dev/include/bullet/LinearMath/btMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btAlignedObjectArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+		../../../../dev/include/bullet/LinearMath/btTransformUtil.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h \
+		../../../../dev/include/bullet/LinearMath/btAabbUtil2.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConeShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h \
+		../../../../dev/include/bullet/LinearMath/btHashMap.h \
+		../../../../dev/include/bullet/LinearMath/btSerializer.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h \
+		../../../../dev/include/bullet/LinearMath/btQuickprof.h \
+		../../../../dev/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h \
+		../../../../dev/include/bullet/LinearMath/btDefaultMotionState.h \
+		../../../../dev/include/bullet/LinearMath/btIDebugDraw.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btRigidBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
+		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
+		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/physicsbody.o src/physicsbody.cpp
 
 obj/moc_mainwindow.o: moc/moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_mainwindow.o moc/moc_mainwindow.cpp

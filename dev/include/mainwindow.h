@@ -1,15 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
-// OpenVDB includes
-#include <openvdb/openvdb.h>
-#include <openvdb/tools/MeshToVolume.h>
-
-// Bullets includes
-#include <bullet/btBulletDynamicsCommon.h>
-#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
-
 // Qt includes
 #include <QMainWindow>
 
