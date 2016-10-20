@@ -18,6 +18,7 @@ void PhysicsBody::LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_s
     m_colour = glm::vec3(0.8f, 0.4f, 0.4f);
     m_colourLoc = m_shaderProg->uniformLocation("colour");
 
+
     //----------------------------------------------------------------------
     // Get mesh info from file
 
@@ -40,13 +41,13 @@ void PhysicsBody::LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_s
     {
         m_meshElementIndex.push_back((int)meshSample.getFaceIndices()->get()[i]);
     }
-
-/*
-    IXform x( child, kWrapExisting );
-    XformSample xs;
-    x.getSchema().get( xs );
-    M44d mat=xs.getMatrix();
-*/
+    for(uint32_t i=0;i<numIndices/3;i++)
+    {
+        int tri1 = (int)meshSample.getFaceIndices()->get()[(3*i) + 0];
+        int tri2 = (int)meshSample.getFaceIndices()->get()[(3*i) + 1];
+        int tri3 = (int)meshSample.getFaceIndices()->get()[(3*i) + 2];
+        m_meshTrisElements.push_back(openvdb::Vec3I(tri1,tri2,tri3));
+    }
 
     // Get mesh vertex positions and normals
     IN3fGeomParam normals = meshSchema.getNormalsParam();
@@ -58,6 +59,7 @@ void PhysicsBody::LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_s
 
         m_meshVerts.push_back(glm::vec3(p.x, p.y, p.z));
         m_meshVerts.push_back(glm::vec3(n.x, n.y, n.z));
+        m_meshVertsVDB.push_back(openvdb::Vec3f(p.x, p.y, p.z));
 
     }
 
@@ -89,8 +91,6 @@ void PhysicsBody::LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_s
 
 void PhysicsBody::InitialiseRenderMesh()
 {
-    // Qt SLOTS not necessarrily in main thread, need to get graphics context
-    // makeCurrent();
 
     m_shaderProg->bind();
     glUniform3fv(m_colourLoc, 1, &m_colour[0]);
@@ -117,23 +117,25 @@ void PhysicsBody::InitialiseRenderMesh()
     m_meshVAO.release();
 
     m_shaderProg->release();
-
-    //doneCurrent();
 }
 
 
 void PhysicsBody::InitialisePhysicsMesh()
 {
-    for(int i=0;i<5;i++)
-    {
-        for(int j=0;j<5;j++)
-        {
-            for(int k=0;k<5;k++)
-            {
-                AppendSphereVerts(glm::vec3(i*3.0f,j*3.0f,k*3.0f), 1.0f, 16, 32);
-            }
+    // Convert mesh to spheres for spherical rigidbodies
+    openvdb::math::Transform::Ptr xform = openvdb::math::Transform::createLinearTransform();
+    openvdb::tools::QuadAndTriangleDataAdapter<openvdb::Vec3f, openvdb::Vec3I> mesh(m_meshVertsVDB, m_meshTrisElements);
+    openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create();
 
-        }
+    grid = openvdb::tools::meshToVolume<openvdb::FloatGrid>(mesh, *xform);
+
+    std::vector<openvdb::Vec4s> spheres;
+    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, spheres, 1000, false, 0.01f);
+
+    // Add spheres for rendering
+    for(auto sphere : spheres)
+    {
+        AppendSphereVerts(glm::vec3(sphere.x(), sphere.y(), sphere.z()), sphere.w());
     }
 }
 
@@ -239,7 +241,6 @@ void PhysicsBody::AppendSphereVerts(glm::vec3 _pos, float _radius, int _stacks, 
         m_sphereElementIndex.push_back(indexOffset + ((_stacks-3)*_slices +p));
     }
 
-    std::cout<<m_sphereVerts.size()<<"\n";
 
 }
 

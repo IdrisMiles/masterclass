@@ -2,8 +2,9 @@
 #define PHYSICSBODY_H
 
 // OpenVDB includes
-//#include <openvdb/openvdb.h>
-//#include <openvdb/tools/MeshToVolume.h>
+#include <openvdb/openvdb.h>
+#include <openvdb/tools/MeshToVolume.h>
+#include <openvdb/tools/VolumeToSpheres.h>
 
 // Open GL includes
 #include <GL/glew.h>
@@ -56,6 +57,8 @@ private:
     QOpenGLBuffer m_meshIBO;
     std::vector<glm::vec3> m_meshVerts;
     std::vector<unsigned int> m_meshElementIndex;
+    std::vector<openvdb::Vec3f> m_meshVertsVDB;
+    std::vector<openvdb::Vec3I> m_meshTrisElements;
 
     // members for rendering sphereical representation of mesh
     QOpenGLVertexArrayObject m_sphereVAO;

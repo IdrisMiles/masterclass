@@ -799,6 +799,21 @@ moc/moc_mainwindow.cpp: ../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QMainWi
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
 		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
+		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		include/mainwindow.h \
 		../../../../Qt5.7.0/5.7/gcc_64/bin/moc
 	/home/idris/Qt5.7.0/5.7/gcc_64/bin/moc $(DEFINES) -I/home/idris/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++ -I/home/idris/uni/masterclass/masterclass/dev -I/home/idris/uni/masterclass/masterclass/dev/include -I/home/idris/dev/include -I/home/idris/dev/include/bullet -I/usr/include/openvdb -I/usr/local/include/OpenEXR -I/usr/local/include/Alembic -I/home/idris/Qt5.7.0/5.7/gcc_64/include -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtWidgets -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtGui -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/mainwindow.h -o moc/moc_mainwindow.cpp
@@ -1019,6 +1034,21 @@ moc/moc_openglscene.cpp: include/physicsbody.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
 		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
+		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		include/openglscene.h \
 		../../../../Qt5.7.0/5.7/gcc_64/bin/moc
 	/home/idris/Qt5.7.0/5.7/gcc_64/bin/moc $(DEFINES) -I/home/idris/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++ -I/home/idris/uni/masterclass/masterclass/dev -I/home/idris/uni/masterclass/masterclass/dev/include -I/home/idris/dev/include -I/home/idris/dev/include/bullet -I/usr/include/openvdb -I/usr/local/include/OpenEXR -I/usr/local/include/Alembic -I/home/idris/Qt5.7.0/5.7/gcc_64/include -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtWidgets -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtGui -I/home/idris/Qt5.7.0/5.7/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/openglscene.h -o moc/moc_openglscene.cpp
@@ -1264,6 +1294,21 @@ obj/main.o: src/main.cpp include/mainwindow.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
 		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
+		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/QApplication \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtWidgets/qapplication.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1495,6 +1540,21 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
 		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
+		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		form/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/mainwindow.o src/mainwindow.cpp
 
@@ -1715,6 +1775,21 @@ obj/openglscene.o: src/openglscene.cpp include/openglscene.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h \
 		../../../../dev/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h \
 		../../../../dev/include/bullet/BulletDynamics/Dynamics/btActionInterface.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactShape.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionShapes/btTriangleShape.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactQuantizedBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGImpactBvh.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btBoxCollision.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btTriangleShapeEx.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btClipPolygon.h \
+		../../../../dev/include/bullet/LinearMath/btGeometryUtil.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btGeometryOperations.h \
+		../../../../dev/include/bullet/BulletCollision/Gimpact/btQuantization.h \
+		../../../../dev/include/bullet/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h \
+		../../../../dev/include/bullet/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/QOpenGLContext \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtGui/qopenglcontext.h \
 		../../../../Qt5.7.0/5.7/gcc_64/include/QtCore/QScopedPointer \
