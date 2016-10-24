@@ -5,6 +5,7 @@
 #include <QOpenGLContext>
 #include <QMouseEvent>
 #include <QFileDialog>
+#include <QKeyEvent>
 
 
 OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
@@ -22,7 +23,7 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
 
     setFormat(format);
 
-
+    m_runSim = false;
     m_physicsBodies.clear();
     initializePhysicsWorld();
 }
@@ -172,9 +173,24 @@ void OpenGLScene::loadMesh()
     }
 
     makeCurrent();
-    m_physicsBodies.push_back(new PhysicsBody());
-    m_physicsBodies.back()->LoadMesh(file.toStdString(), m_shaderProg);
+    m_physicsBodies.push_back(new PhysicsBody(m_physicsBodies.size(), m_shaderProg));
+    m_physicsBodies.back()->LoadMesh(file.toStdString());
+    m_physicsBodies.back()->AddToDynamicWorld(m_dynamicWorld);
     doneCurrent();
+    update();
+}
+
+void OpenGLScene::ToggleSim()
+{
+    m_runSim = !m_runSim;
+    if(m_runSim)
+    {
+
+    }
+    else
+    {
+
+    }
     update();
 }
 
@@ -220,34 +236,26 @@ void OpenGLScene::initializeGL()
 
     // setup shaders
     m_shaderProg = new QOpenGLShaderProgram;
-    m_shaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, "../shader/vert.glsl");
-    m_shaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, "../shader/frag.glsl");
+    m_shaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, "../shader/instanceVert.glsl");
+    m_shaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, "../shader/instanceFrag.glsl");
     m_shaderProg->bindAttributeLocation("vertex", 0);
     m_shaderProg->bindAttributeLocation("normal", 1);
     m_shaderProg->link();
 
     m_shaderProg->bind();
     m_projMatrixLoc = m_shaderProg->uniformLocation("projMatrix");
-    m_mvMatrixLoc = m_shaderProg->uniformLocation("mvMatrix");
-    m_normalMatrixLoc = m_shaderProg->uniformLocation("normalMatrix");
+    m_viewMatrixLoc = m_shaderProg->uniformLocation("viewMatrix");
     m_lightPosLoc = m_shaderProg->uniformLocation("lightPos");
+
 
     // initialise view and projection matrices
     m_viewMat = glm::mat4(1);
     m_viewMat = glm::lookAt(glm::vec3(0,0,0),glm::vec3(0,0,-1),glm::vec3(0,1,0));
-    m_projMat = glm::perspective(45.0f, GLfloat(width()) / height(), 0.01f, 100.0f);
+    m_projMat = glm::perspective(45.0f, GLfloat(width()) / height(), 0.01f, 1000.0f);
 
     // Light position is fixed.
     m_lightPos = glm::vec3(0, 0, 70);
     glUniform3fv(m_lightPosLoc, 1, &m_lightPos[0]);
-
-
-    //---------------------------------------------------------------------------------------
-    // Demo triangle - replace this per project
-    //initializeDemoTriangle();
-    //initializeAlembicModel();
-    //---------------------------------------------------------------------------------------
-
 
     m_shaderProg->release();
 }
@@ -262,19 +270,25 @@ void OpenGLScene::initializeDemoTriangle()
     m_vao.bind();
 
 
-    static GLfloat const triangleVertices[] = {
-        -5.0f, -5.0f, -0.0f,
-        0.0f, 0.0f, 1.0f,
-        5.0f, -5.0f, -0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 5.0f, -0.0f,
-        0.0f, 0.0f, 1.0f
+    static GLfloat const planeVertices[] = {
+        -5.0f, 0.0f, -5.0f,
+        0.0f, 1.0f, 0.0f,
+        5.0f, 0.0f, -5.0f,
+        0.0f, 1.0f, 0.0f,
+        5.0f, 0.0f, 5.0f,
+        0.0f, 1.0f, 0.0f,
+        5.0f, 0.0f, 5.0f,
+        0.0f, 1.0f, 0.0f,
+        -5.0f, 0.0f, 5.0f,
+        0.0f, 1.0f, 0.0f
+        -5.0f, 0.0f, -5.0f,
+        0.0f, 1.0f, 0.0f
     };
 
     // Setup our vertex buffer object.
     m_vbo.create();
     m_vbo.bind();
-    m_vbo.allocate(triangleVertices, 18 * sizeof(GLfloat));
+    m_vbo.allocate(planeVertices, 18 * sizeof(GLfloat));
 
     glEnableVertexAttribArray( 0);
     glEnableVertexAttribArray(1);
@@ -316,9 +330,7 @@ void OpenGLScene::paintGL()
     m_shaderProg->bind();
 
     glUniformMatrix4fv(m_projMatrixLoc, 1, false, &m_projMat[0][0]);
-    glUniformMatrix4fv(m_mvMatrixLoc, 1, false, &(m_modelMat*m_viewMat)[0][0]);
-    glm::mat3 normalMatrix =  glm::inverse(m_modelMat);
-    glUniformMatrix3fv(m_normalMatrixLoc, 1, true, &normalMatrix[0][0]);
+    glUniformMatrix4fv(m_viewMatrixLoc, 1, false, &(m_viewMat*m_modelMat)[0][0]);
 
 
     //---------------------------------------------------------------------------------------
@@ -334,6 +346,12 @@ void OpenGLScene::paintGL()
 
 
     m_shaderProg->release();
+
+    if(m_runSim)
+    {
+        m_dynamicWorld->stepSimulation(1/60.0f, 10);
+        update();
+    }
 }
 
 
@@ -342,7 +360,7 @@ void OpenGLScene::paintGL()
 
 void OpenGLScene::resizeGL(int w, int h)
 {
-    m_projMat = glm::perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
+    m_projMat = glm::perspective(45.0f, GLfloat(w) / h, 0.01f, 1000.0f);
 }
 
 void OpenGLScene::mousePressEvent(QMouseEvent *event)
@@ -362,4 +380,18 @@ void OpenGLScene::mouseMoveEvent(QMouseEvent *event)
         setZTranslation(m_zDis + dy);
     }
     m_lastPos = event->pos();
+}
+
+void OpenGLScene::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_P)
+    {
+        m_runSim = !m_runSim;
+    }
+
+    if(event->key() == Qt::Key_P)
+    {
+    }
+    update();
+
 }

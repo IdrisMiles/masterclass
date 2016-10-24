@@ -8,9 +8,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     m_glScene = new OpenGLScene(this);
-    ui->gridLayout->addWidget(m_glScene, 0, 0, 1, 1);
+    ui->gridLayout->addWidget(m_glScene, 0, 0, 2, 1);
 
     connect(ui->s_LoadAlembic, SIGNAL(released()), m_glScene, SLOT(loadMesh()));
+    connect(ui->s_runSimBtn, SIGNAL(released()), m_glScene, SLOT(ToggleSim()));
 
 }
 

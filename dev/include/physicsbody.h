@@ -32,10 +32,11 @@ using namespace Alembic::AbcGeom;
 class PhysicsBody
 {
 public:
-    PhysicsBody();
-    void LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_shaderProg);
+    PhysicsBody(const unsigned int _id, QOpenGLShaderProgram *_shaderProg, const glm::vec3 _colour = glm::vec3(0.8f, 0.4f, 0.4f));
+    void LoadMesh(const std::string _meshFile);
     void DrawMesh();
     void DrawSpheres();
+    void AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
 
 private:
 
@@ -45,26 +46,33 @@ private:
     void InitialiseRenderSpheres();
     void AppendSphereVerts(glm::vec3 _pos = glm::vec3(0.0f,0.0f,0.0f), float _radius = 1.0f, int _stacks = 16, int _slices = 32);
 
+    unsigned int m_id;
+
     // common members for rendering
+    int m_modelMatrixLoc;
+    int m_colourLoc;
     glm::mat4 m_modelMat;
     glm::vec3 m_colour;
-    int m_colourLoc;
     QOpenGLShaderProgram *m_shaderProg;
 
     // members for rendering actual mesh
     QOpenGLVertexArrayObject m_meshVAO;
     QOpenGLBuffer m_meshVBO;
     QOpenGLBuffer m_meshIBO;
+    QOpenGLBuffer m_meshModelMatInstanceBO;
     std::vector<glm::vec3> m_meshVerts;
     std::vector<unsigned int> m_meshElementIndex;
     std::vector<openvdb::Vec3f> m_meshVertsVDB;
     std::vector<openvdb::Vec3I> m_meshTrisElements;
 
     // members for rendering sphereical representation of mesh
+    int m_modelMatricesLoc;
+    std::vector<glm::mat4> m_sphereModelMats;
     QOpenGLVertexArrayObject m_sphereVAO;
     QOpenGLBuffer m_sphereVBO;
     QOpenGLBuffer m_sphereNBO;
     QOpenGLBuffer m_sphereIBO;
+    QOpenGLBuffer m_sphereModelMatInstanceBO;
     std::vector<glm::vec3> m_sphereVerts;
     std::vector<glm::vec3> m_sphereNormals;
     std::vector<unsigned int> m_sphereElementIndex;
@@ -72,9 +80,9 @@ private:
     // Physics members
     btScalar m_mass;
     btVector3 m_inertia;
-    btDefaultMotionState *m_motionState;
-    btCollisionShape * m_collisionShape;
-    btRigidBody *m_rigidBody;
+    std::vector<btDefaultMotionState*> m_motionStates;
+    std::vector<btCollisionShape*> m_collisionShapes;
+    std::vector<btRigidBody*> m_rigidBodies;
 };
 
 #endif // PHYSICSBODY_H

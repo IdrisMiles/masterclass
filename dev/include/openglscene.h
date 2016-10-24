@@ -35,6 +35,7 @@ public:
 
 public slots:
     void loadMesh();
+    void ToggleSim();
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
@@ -57,6 +58,7 @@ protected:
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private:
     void initializeDemoTriangle();
@@ -80,8 +82,8 @@ private:
     QOpenGLShaderProgram *m_shaderProg;
 
     int m_projMatrixLoc;
-    int m_mvMatrixLoc;
-    int m_normalMatrixLoc;
+    int m_viewMatrixLoc;
+    int m_modelMatrixLoc;
     int m_lightPosLoc;
 
     glm::mat4 m_projMat;
@@ -94,6 +96,7 @@ private:
     QOpenGLBuffer m_vbo;
 
     // Bullet physics stuff
+    bool m_runSim;
     btBroadphaseInterface *m_broadPhase;
     btDefaultCollisionConfiguration *m_collisionConfig;
     btCollisionDispatcher *m_collisionDispatcher;
