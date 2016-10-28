@@ -1,5 +1,5 @@
 
-QT       += core
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,7 +29,9 @@ INCLUDEPATH +=	./include                       \
 
 # libs required for boost and openvdb
 LIBS +=	-L/home/idris/dev/lib -lBulletDynamics -lBulletCollision -lLinearMath \
-        -L/usr/local/lib -L/usr/lib/x86_64/ -lopenvdb -lpthread -lHalf -ltbb \
+        -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu -lopenvdb -lpthread -lHalf -ltbb \
         -lHalf -lAlembic -lImath -lIex -lIexMath -lIlmThread -pthread -lhdf5_serial \
+        -lassimp \
+        -lboost_filesystem -lboost_system \
         -L/usr/lib -lGL -lGLU -lGLEW
 

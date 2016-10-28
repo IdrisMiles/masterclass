@@ -33,8 +33,11 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    void loadPhysicsBody(const std::string &_file, PhysicsBodyProperties *_properties = nullptr);
+    PhysicsBody* GetPhysicsBody(const unsigned &_i = 0) {return  (_i<m_physicsBodies.size())?m_physicsBodies[_i]:NULL;}
+    int NumPhysicsBodies()const {return m_physicsBodies.size();}
+
 public slots:
-    void loadMesh();
     void ToggleSim();
     void setXRotation(int angle);
     void setYRotation(int angle);
@@ -43,14 +46,6 @@ public slots:
     void setYTranslation(int y);
     void setZTranslation(int z);
     void cleanup();
-
-signals:
-    void xRotationChanged(int angle);
-    void yRotationChanged(int angle);
-    void zRotationChanged(int angle);
-    void xTranslationChanged(int x);
-    void yTranslationChanged(int y);
-    void zTranslationChanged(int z);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -61,14 +56,10 @@ protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    void initializeDemoTriangle();
-    void renderDemoTriangle();
-    void cleanDemoTriangle();
-
     void initializePhysicsWorld();
     void cleanPhysicsWorld();
-
-
+    void initializeGroundPlane();
+    void drawGroundPlane();
 
     int m_xRot;
     int m_yRot;
@@ -77,10 +68,8 @@ private:
     int m_yDis;
     int m_zDis;
     QPoint m_lastPos;
-    glm::vec3 m_lightPos;
 
-    QOpenGLShaderProgram *m_shaderProg;
-
+    // Scene shader stuff
     int m_projMatrixLoc;
     int m_viewMatrixLoc;
     int m_modelMatrixLoc;
@@ -89,11 +78,15 @@ private:
     glm::mat4 m_projMat;
     glm::mat4 m_viewMat;
     glm::mat4 m_modelMat;
+    glm::vec3 m_lightPos;
+    QOpenGLShaderProgram *m_shaderProg;
 
-
-    // Demo triangle specifics
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_vbo;
+    // Ground plane stuff
+    QOpenGLVertexArrayObject m_groundVAO;
+    QOpenGLBuffer m_groundVBO;
+    QOpenGLBuffer m_groundMBO;
+    glm::vec3 m_groundColour;
+    GLuint m_colourLoc;
 
     // Bullet physics stuff
     bool m_runSim;
@@ -105,10 +98,9 @@ private:
     btCollisionShape *m_groundShape;
     btDefaultMotionState *m_groundMotionState;
     btRigidBody *m_groundRB;
+
     std::vector<PhysicsBody*> m_physicsBodies;
 
-    glm::vec3 m_colour;
-    int m_colourLoc;
 
 public:
 

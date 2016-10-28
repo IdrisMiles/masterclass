@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>777</width>
-    <height>531</height>
+    <width>1065</width>
+    <height>670</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,21 +15,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="1">
-     <widget class="QPushButton" name="s_LoadAlembic">
-      <property name="text">
-       <string>Load model</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QPushButton" name="s_runSimBtn">
-      <property name="text">
-       <string>Run Sim</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0" rowspan="4">
+    <item row="0" column="0" rowspan="5">
      <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -42,27 +28,18 @@
       </property>
      </spacer>
     </item>
-    <item row="0" column="1" rowspan="2">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>GroupBox</string>
+    <item row="4" column="2">
+     <widget class="QPushButton" name="s_runSimBtn">
+      <property name="text">
+       <string>Run Sim</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Physics Body</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Physics Constraints</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QPushButton" name="s_LoadModel">
+      <property name="text">
+       <string>Load model</string>
+      </property>
      </widget>
     </item>
    </layout>
@@ -72,7 +49,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>777</width>
+     <width>1065</width>
      <height>19</height>
     </rect>
    </property>

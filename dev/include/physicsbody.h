@@ -1,6 +1,10 @@
 #ifndef PHYSICSBODY_H
 #define PHYSICSBODY_H
 
+#ifdef foreach
+#undef foreach
+#endif
+
 // OpenVDB includes
 #include <openvdb/openvdb.h>
 #include <openvdb/tools/MeshToVolume.h>
@@ -26,23 +30,29 @@
 #include "Alembic/AbcCoreHDF5/All.h"
 #include "Alembic/Abc/ErrorHandler.h"
 
+
+#include "physicsbodyproperties.h"
+
 using namespace Alembic::Abc;
 using namespace Alembic::AbcGeom;
+
 
 class PhysicsBody
 {
 public:
-    PhysicsBody(const unsigned int _id, QOpenGLShaderProgram *_shaderProg, const glm::vec3 _colour = glm::vec3(0.8f, 0.4f, 0.4f));
+    PhysicsBody(const unsigned int _id, QOpenGLShaderProgram *_shaderProg, PhysicsBodyProperties *_properties = nullptr);
     void LoadMesh(const std::string _meshFile);
     void DrawMesh();
     void DrawSpheres();
     void AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
+    void ToggleRenderMode();
 
 private:
 
     void RecursiveTraverseAlembicGetPolyMesh(const IObject &_object, int _tab, int _depth, IPolyMesh &_outputMesh);
     void InitialiseRenderMesh();
-    void InitialisePhysicsMesh();
+    void InitialiseSphericalRigidbodies();
+    void InitialiseInternalConstraints();
     void InitialiseRenderSpheres();
     void AppendSphereVerts(glm::vec3 _pos = glm::vec3(0.0f,0.0f,0.0f), float _radius = 1.0f, int _stacks = 16, int _slices = 32);
 
@@ -58,12 +68,14 @@ private:
     // members for rendering actual mesh
     QOpenGLVertexArrayObject m_meshVAO;
     QOpenGLBuffer m_meshVBO;
+    QOpenGLBuffer m_meshNBO;
     QOpenGLBuffer m_meshIBO;
     QOpenGLBuffer m_meshModelMatInstanceBO;
     std::vector<glm::vec3> m_meshVerts;
-    std::vector<unsigned int> m_meshElementIndex;
-    std::vector<openvdb::Vec3f> m_meshVertsVDB;
-    std::vector<openvdb::Vec3I> m_meshTrisElements;
+    std::vector<glm::vec3> m_meshNorms;
+    std::vector<openvdb::Vec3I> m_meshElementIndex;
+    bool m_wireframe;
+    bool m_drawMesh;
 
     // members for rendering sphereical representation of mesh
     int m_modelMatricesLoc;
@@ -76,6 +88,7 @@ private:
     std::vector<glm::vec3> m_sphereVerts;
     std::vector<glm::vec3> m_sphereNormals;
     std::vector<unsigned int> m_sphereElementIndex;
+    bool m_drawSpheres;
 
     // Physics members
     btScalar m_mass;
@@ -83,6 +96,10 @@ private:
     std::vector<btDefaultMotionState*> m_motionStates;
     std::vector<btCollisionShape*> m_collisionShapes;
     std::vector<btRigidBody*> m_rigidBodies;
+    std::vector<btPoint2PointConstraint*> m_internalConstraints;
+    std::vector<openvdb::Vec4s> m_spheres;
+    std::vector<glm::vec3> m_initSpheres;
+    PhysicsBodyProperties *m_physicsBodyProperties;
 };
 
 #endif // PHYSICSBODY_H

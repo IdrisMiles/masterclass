@@ -22,6 +22,8 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     format.setStencilBufferSize(8);
 
     setFormat(format);
+    setFocus();
+    setFocusPolicy(Qt::StrongFocus);
 
     m_runSim = false;
     m_physicsBodies.clear();
@@ -59,7 +61,6 @@ void OpenGLScene::setXTranslation(int x)
     qNormalizeAngle(x);
     if (x != m_xDis) {
         m_xDis = x;
-        emit xTranslationChanged(x);
         update();
     }
 }
@@ -69,7 +70,6 @@ void OpenGLScene::setYTranslation(int y)
     qNormalizeAngle(y);
     if (y != m_yDis) {
         m_yDis = y;
-        emit yTranslationChanged(y);
         update();
     }
 }
@@ -79,7 +79,6 @@ void OpenGLScene::setZTranslation(int z)
     qNormalizeAngle(z);
     if (z != m_zDis) {
         m_zDis= z;
-        emit zTranslationChanged(z);
         update();
     }
 }
@@ -89,7 +88,6 @@ void OpenGLScene::setXRotation(int angle)
     qNormalizeAngle(angle);
     if (angle != m_xRot) {
         m_xRot = angle;
-        emit xRotationChanged(angle);
         update();
     }
 }
@@ -99,7 +97,6 @@ void OpenGLScene::setYRotation(int angle)
     qNormalizeAngle(angle);
     if (angle != m_yRot) {
         m_yRot = angle;
-        emit yRotationChanged(angle);
         update();
     }
 }
@@ -109,7 +106,6 @@ void OpenGLScene::setZRotation(int angle)
     qNormalizeAngle(angle);
     if (angle != m_zRot) {
         m_zRot = angle;
-        emit zRotationChanged(angle);
         update();
     }
 }
@@ -122,17 +118,13 @@ void OpenGLScene::cleanup()
 {
     makeCurrent();
     cleanPhysicsWorld();
-    cleanDemoTriangle();
+    m_groundVBO.destroy();
+    m_groundVAO.destroy();
     delete m_shaderProg;
     m_shaderProg = 0;
     doneCurrent();
 }
 
-void OpenGLScene::cleanDemoTriangle()
-{
-    m_vbo.destroy();
-    m_vao.destroy();
-}
 
 void OpenGLScene::cleanPhysicsWorld()
 {
@@ -163,18 +155,11 @@ void OpenGLScene::cleanPhysicsWorld()
 //--------------------------------------------------------------------------------------------------
 // Initialization and loading methods
 
-void OpenGLScene::loadMesh()
+void OpenGLScene::loadPhysicsBody(const std::string &_file, PhysicsBodyProperties *_properties)
 {
-    QString file = QFileDialog::getOpenFileName(this,QString("Open File"), QString("./"), QString("Alembic files (*.abc)"));
-
-    if (file.isNull())
-    {
-        return;
-    }
-
     makeCurrent();
-    m_physicsBodies.push_back(new PhysicsBody(m_physicsBodies.size(), m_shaderProg));
-    m_physicsBodies.back()->LoadMesh(file.toStdString());
+    m_physicsBodies.push_back(new PhysicsBody(m_physicsBodies.size(), m_shaderProg, _properties));
+    m_physicsBodies.back()->LoadMesh(_file);
     m_physicsBodies.back()->AddToDynamicWorld(m_dynamicWorld);
     doneCurrent();
     update();
@@ -225,6 +210,64 @@ void OpenGLScene::initializePhysicsWorld()
     m_dynamicWorld->addRigidBody(m_groundRB);
 }
 
+void OpenGLScene::initializeGroundPlane()
+{
+    m_groundColour = glm::vec3(0.7f, 0.7f, 0.7f);
+    m_colourLoc = m_shaderProg->uniformLocation("colour");
+    glUniform3fv(m_colourLoc, 1, &m_groundColour[0]);
+
+    static glm::mat4 modelMat(1.0);
+    GLuint modelMatricesLoc = m_shaderProg->attributeLocation("modelMatrix");
+
+    static GLfloat const planeVertices[] = {
+        100.0f, 0.0f, 100.0f,   // front right
+        0.0f, 1.0f, 0.0f,
+        100.0f, 0.0f, -100.0f,  // back right
+        0.0f, 1.0f, 0.0f,
+        -100.0f, 0.0f, -100.0f, // back left
+        0.0f, 1.0f, 0.0f,
+        -100.0f, 0.0f, 100.0f,  // front left
+        0.0f, 1.0f, 0.0f,
+        100.0f, 0.0f, 100.0f,   // fonrt right
+        0.0f, 1.0f, 0.0f,
+        -100.0f, 0.0f, -100.0f,  // back left
+        0.0f, 1.0f, 0.0f
+    };
+
+    m_groundVAO.create();
+    m_groundVAO.bind();
+
+    // Setup our vertex buffer object.
+    m_groundVBO.create();
+    m_groundVBO.bind();
+    m_groundVBO.allocate(planeVertices, 12 * 3 * sizeof(GLfloat));
+    glEnableVertexAttribArray( 0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    m_groundVBO.release();
+
+    // set up instance model matrix buffer object
+    m_groundMBO.create();
+    m_groundMBO.bind();
+    m_groundMBO.allocate(&modelMat, 1 * sizeof(glm::mat4));
+    glEnableVertexAttribArray(modelMatricesLoc+0);
+    glEnableVertexAttribArray(modelMatricesLoc+1);
+    glEnableVertexAttribArray(modelMatricesLoc+2);
+    glEnableVertexAttribArray(modelMatricesLoc+3);
+    glVertexAttribPointer(modelMatricesLoc+0, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), 0);
+    glVertexAttribPointer(modelMatricesLoc+1, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), reinterpret_cast<void *>(1 * sizeof(glm::vec4)));
+    glVertexAttribPointer(modelMatricesLoc+2, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), reinterpret_cast<void *>(2 * sizeof(glm::vec4)));
+    glVertexAttribPointer(modelMatricesLoc+3, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), reinterpret_cast<void *>(3 * sizeof(glm::vec4)));
+
+    glVertexAttribDivisor(modelMatricesLoc+0, 1);
+    glVertexAttribDivisor(modelMatricesLoc+1, 1);
+    glVertexAttribDivisor(modelMatricesLoc+2, 1);
+    glVertexAttribDivisor(modelMatricesLoc+3, 1);
+    m_groundMBO.release();
+
+    m_groundVAO.release();
+}
 
 void OpenGLScene::initializeGL()
 {
@@ -254,63 +297,26 @@ void OpenGLScene::initializeGL()
     m_projMat = glm::perspective(45.0f, GLfloat(width()) / height(), 0.01f, 1000.0f);
 
     // Light position is fixed.
-    m_lightPos = glm::vec3(0, 0, 70);
+    m_lightPos = glm::vec3(0, 20, 70);
     glUniform3fv(m_lightPosLoc, 1, &m_lightPos[0]);
 
+    initializeGroundPlane();
+
     m_shaderProg->release();
-}
-
-void OpenGLScene::initializeDemoTriangle()
-{
-    m_colour = glm::vec3(0.8f, 0.4f, 0.4f);
-    m_colourLoc = m_shaderProg->uniformLocation("colour");
-    glUniform3fv(m_colourLoc, 1, &m_colour[0]);
-
-    m_vao.create();
-    m_vao.bind();
-
-
-    static GLfloat const planeVertices[] = {
-        -5.0f, 0.0f, -5.0f,
-        0.0f, 1.0f, 0.0f,
-        5.0f, 0.0f, -5.0f,
-        0.0f, 1.0f, 0.0f,
-        5.0f, 0.0f, 5.0f,
-        0.0f, 1.0f, 0.0f,
-        5.0f, 0.0f, 5.0f,
-        0.0f, 1.0f, 0.0f,
-        -5.0f, 0.0f, 5.0f,
-        0.0f, 1.0f, 0.0f
-        -5.0f, 0.0f, -5.0f,
-        0.0f, 1.0f, 0.0f
-    };
-
-    // Setup our vertex buffer object.
-    m_vbo.create();
-    m_vbo.bind();
-    m_vbo.allocate(planeVertices, 18 * sizeof(GLfloat));
-
-    glEnableVertexAttribArray( 0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-
-    m_vbo.release();
-    m_vao.release();
 }
 
 
 //--------------------------------------------------------------------------------------------------
 // Render methods
 
-void OpenGLScene::renderDemoTriangle()
+void OpenGLScene::drawGroundPlane()
 {
-    m_vao.bind();
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    m_vao.release();
+    glUniform3fv(m_colourLoc, 1, &m_groundColour[0]);
+    m_groundVAO.bind();
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    m_groundVAO.release();
 }
+
 
 void OpenGLScene::paintGL()
 {
@@ -334,8 +340,8 @@ void OpenGLScene::paintGL()
 
 
     //---------------------------------------------------------------------------------------
-    // Draw code - replace this with project specific draw stuff
-    //renderDemoTriangle();
+    // Draw code
+    drawGroundPlane();
 
     for(auto&& body : m_physicsBodies)
     {
@@ -389,8 +395,12 @@ void OpenGLScene::keyPressEvent(QKeyEvent *event)
         m_runSim = !m_runSim;
     }
 
-    if(event->key() == Qt::Key_P)
+    if(event->key() == Qt::Key_W)
     {
+        for(auto rb : m_physicsBodies)
+        {
+            rb->ToggleRenderMode();
+        }
     }
     update();
 

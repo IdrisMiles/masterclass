@@ -1,17 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
-#include <openvdb/openvdb.h>
-#include <openvdb/tools/MeshToVolume.h>
-#include <openvdb/tools/VolumeToSpheres.h>
-
+// QtOpengl include
+#include "openglscene.h"
 
 // Qt includes
 #include <QMainWindow>
-
-// QtOpengl include
-#include "openglscene.h"
+#include <QTabWidget>
+#include <QGroupBox>
 
 
 
@@ -27,10 +23,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void AddSimObject();
+
 
 private:
     Ui::MainWindow *ui;
     OpenGLScene *m_glScene;
+    QGroupBox *m_propertiesGroupbox;
+    QTabWidget * m_propertiesTab;
 };
 
 #endif // MAINWINDOW_H

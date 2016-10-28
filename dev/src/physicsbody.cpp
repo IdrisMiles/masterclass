@@ -1,16 +1,27 @@
 #include "physicsbody.h"
 
+// ASSIMP includes
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
+#include <boost/filesystem.hpp>
 
 
-PhysicsBody::PhysicsBody(const unsigned int _id, QOpenGLShaderProgram *_shaderProg, const glm::vec3 _colour)
+
+PhysicsBody::PhysicsBody(const unsigned int _id, QOpenGLShaderProgram *_shaderProg, PhysicsBodyProperties *_properties)
 {
     m_id = _id;
     m_shaderProg = _shaderProg;
     m_colourLoc = m_shaderProg->uniformLocation("colour");
     m_modelMatricesLoc = m_shaderProg->attributeLocation("modelMatrix");
 
-
-    m_colour = _colour;
+    m_wireframe = false;
+    m_drawMesh = true;
+    m_drawSpheres = true;
+    m_physicsBodyProperties = _properties;
+    m_colour = glm::vec3(0.8f,0.4f,0.4f);
+    //std::cout<<m_physicsBodyProperties->colour.x<<", "<<m_physicsBodyProperties->colour.y<<", "<<m_physicsBodyProperties->colour.z<<"\n";
 
 }
 
@@ -25,51 +36,89 @@ void PhysicsBody::LoadMesh(const std::string _meshFile)
     m_modelMat = glm::mat4(1.0f);
 
 
-
-
     //----------------------------------------------------------------------
     // Get mesh info from file
 
-    // Open the alembic arrchive
-    IArchive iArchive(Alembic::AbcCoreHDF5::ReadArchive(), _meshFile);
-    IObject topObj = iArchive.getTop();
-
-    // Get the mesh within the alembic archive
-    IPolyMesh mesh;
-    RecursiveTraverseAlembicGetPolyMesh(topObj, 0, 8, mesh);
-
-    // Get the mesh schema and samples for the mesh we found
-    IPolyMeshSchema meshSchema = mesh.getSchema();
-    IPolyMeshSchema::Sample meshSample;
-    meshSchema.get(meshSample);
-
-    // Get index array for mesh
-    uint32_t numIndices = meshSample.getFaceIndices()->size();
-    for (uint32_t i=0;i<numIndices;i++)
+    boost::filesystem::path file = _meshFile;
+    if(file.extension() == ".abc")
     {
-        m_meshElementIndex.push_back((int)meshSample.getFaceIndices()->get()[i]);
+        // Open the alembic arrchive
+        IArchive iArchive(Alembic::AbcCoreHDF5::ReadArchive(), _meshFile);
+        IObject topObj = iArchive.getTop();
+
+        // Get the mesh within the alembic archive
+        IPolyMesh mesh;
+        RecursiveTraverseAlembicGetPolyMesh(topObj, 0, 8, mesh);
+
+        // Get the mesh schema and samples for the mesh we found
+        IPolyMeshSchema meshSchema = mesh.getSchema();
+        IPolyMeshSchema::Sample meshSample;
+        meshSchema.get(meshSample);
+
+        // Get index array for mesh
+        uint32_t numIndices = meshSample.getFaceIndices()->size();
+        for(uint32_t i=0;i<numIndices/3;i++)
+        {
+            int tri1 = (int)meshSample.getFaceIndices()->get()[(3*i) + 0];
+            int tri2 = (int)meshSample.getFaceIndices()->get()[(3*i) + 1];
+            int tri3 = (int)meshSample.getFaceIndices()->get()[(3*i) + 2];
+            m_meshElementIndex.push_back(openvdb::Vec3I(tri1,tri2,tri3));
+        }
+
+        // Get mesh vertex positions and normals
+        IN3fGeomParam normals = meshSchema.getNormalsParam();
+        uint32_t numPoints = meshSample.getPositions()->size();
+        for(uint32_t i=0;i<numPoints;i++)
+        {
+            Imath::V3f p = meshSample.getPositions()->get()[i];
+            N3f n = normals.getIndexedValue().getVals()->get()[i];
+
+            m_meshVerts.push_back(glm::vec3(p.x, p.y, p.z));
+            m_meshNorms.push_back(glm::vec3(n.x, n.y, n.z));
+        }
     }
-    for(uint32_t i=0;i<numIndices/3;i++)
+    else
     {
-        int tri1 = (int)meshSample.getFaceIndices()->get()[(3*i) + 0];
-        int tri2 = (int)meshSample.getFaceIndices()->get()[(3*i) + 1];
-        int tri3 = (int)meshSample.getFaceIndices()->get()[(3*i) + 2];
-        m_meshTrisElements.push_back(openvdb::Vec3I(tri1,tri2,tri3));
+
+        // Load mesh with ASSIMP
+        Assimp::Importer importer;
+        const aiScene *scene = importer.ReadFile(_meshFile,
+                                                 aiProcess_GenSmoothNormals |
+                                                 aiProcess_Triangulate |
+                                                 aiProcess_JoinIdenticalVertices |
+                                                 aiProcess_SortByPType);
+        if(!scene)
+        {
+            std::cout<<"Error loading "<<_meshFile<<" with assimp\n";
+        }
+        else
+        {
+            if(scene->HasMeshes())
+            {
+                unsigned int indexOffset = 0;
+                for(unsigned int i=0; i<scene->mNumMeshes; i++)
+                {
+                    unsigned int numFaces = scene->mMeshes[i]->mNumFaces;
+                    for(unsigned int f=0; f<numFaces; f++)
+                    {
+                        auto face = scene->mMeshes[i]->mFaces[f];
+                        m_meshElementIndex.push_back(openvdb::Vec3I(face.mIndices[0]+indexOffset, face.mIndices[1]+indexOffset, face.mIndices[2]+indexOffset));
+                    }
+                    indexOffset += 3 * numFaces;
+
+                    unsigned int numVerts = scene->mMeshes[i]->mNumVertices;
+                    for(unsigned int v=0; v<numVerts; v++)
+                    {
+                        auto vert = scene->mMeshes[i]->mVertices[v];
+                        auto norm = scene->mMeshes[i]->mNormals[v];
+                        m_meshVerts.push_back(glm::vec3(vert.x, vert.y, vert.z));
+                        m_meshNorms.push_back(glm::vec3(norm.x, norm.y, norm.z));
+                    }
+                }
+            }
+        }
     }
 
-    // Get mesh vertex positions and normals
-    IN3fGeomParam normals = meshSchema.getNormalsParam();
-    uint32_t numPoints = meshSample.getPositions()->size();
-    for(uint32_t i=0;i<numPoints;i++)
-    {
-        Imath::V3f p = meshSample.getPositions()->get()[i];
-        N3f n = normals.getIndexedValue().getVals()->get()[i];
-
-        m_meshVerts.push_back(glm::vec3(p.x, p.y, p.z));
-        m_meshVerts.push_back(glm::vec3(n.x, n.y, n.z));
-        m_meshVertsVDB.push_back(openvdb::Vec3f(p.x, p.y, p.z));
-
-    }
 
 
     //----------------------------------------------------------------------
@@ -77,13 +126,12 @@ void PhysicsBody::LoadMesh(const std::string _meshFile)
     InitialiseRenderMesh();
 
 
-    //----------------------------------------------------------------------
-    // Create spherical fill of mesh
-
 
     //----------------------------------------------------------------------
     // Setup spherical Rigidbodies and physics rendering mesh
-    InitialisePhysicsMesh();
+    InitialiseSphericalRigidbodies();
+
+    InitialiseInternalConstraints();
 
 
 
@@ -101,7 +149,7 @@ void PhysicsBody::InitialiseRenderMesh()
 {
 
     m_shaderProg->bind();
-    glUniform3fv(m_colourLoc, 1, &m_colour[0]);
+    glUniform3fv(m_colourLoc, 1, &m_physicsBodyProperties->colour[0]);
 
     m_meshVAO.create();
     m_meshVAO.bind();
@@ -117,16 +165,24 @@ void PhysicsBody::InitialiseRenderMesh()
     m_meshVBO.allocate(&m_meshVerts[0], m_meshVerts.size() * sizeof(glm::vec3));
 
     glEnableVertexAttribArray( 0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), reinterpret_cast<void *>(1 * sizeof(glm::vec3)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::vec3), 0);
     m_meshVBO.release();
+
+
+    // Setup our normals buffer object.
+    m_meshNBO.create();
+    m_meshNBO.bind();
+    m_meshNBO.allocate(&m_meshNorms[0], m_meshNorms.size() * sizeof(glm::vec3));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::vec3), 0);
+    m_meshNBO.release();
 
 
     // set up instance model matrix buffer object
     m_meshModelMatInstanceBO.create();
     m_meshModelMatInstanceBO.bind();
-    m_meshModelMatInstanceBO.allocate(&m_modelMat[0], 1 * sizeof(glm::mat4));
+    m_meshModelMatInstanceBO.allocate(&m_modelMat, 1 * sizeof(glm::mat4));
 
     glEnableVertexAttribArray(m_modelMatricesLoc+0);
     glEnableVertexAttribArray(m_modelMatricesLoc+1);
@@ -151,28 +207,29 @@ void PhysicsBody::InitialiseRenderMesh()
 }
 
 
-void PhysicsBody::InitialisePhysicsMesh()
+void PhysicsBody::InitialiseSphericalRigidbodies()
 {
     // Convert mesh to vdb volume
     openvdb::math::Transform::Ptr xform = openvdb::math::Transform::createLinearTransform();
-    openvdb::tools::QuadAndTriangleDataAdapter<openvdb::Vec3f, openvdb::Vec3I> mesh(m_meshVertsVDB, m_meshTrisElements);
+    openvdb::tools::QuadAndTriangleDataAdapter<glm::vec3, openvdb::Vec3I> mesh(m_meshVerts, m_meshElementIndex);
     openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create();
     grid = openvdb::tools::meshToVolume<openvdb::FloatGrid>(mesh, *xform);
 
     // Fill volume with spheres
-    std::vector<openvdb::Vec4s> spheres;
-    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, spheres, 100, false, 0.1f);
+    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, m_spheres, 100, false, 0.1f,10.0);
 
     // create rigidbody for each sphere and set sphere rendering model matrix
     AppendSphereVerts(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
-    for(auto sphere : spheres)
+    for(auto sphere : m_spheres)
     {
         float x = sphere.x();
         float y = sphere.y();
         float z = sphere.z();
         float r = sphere.w();
+        m_initSpheres.push_back(glm::vec3(x,y,z));
 
         m_collisionShapes.push_back(new btSphereShape(r));
+        m_collisionShapes.back()->setUserPointer((void*)this);
         m_motionStates.push_back(new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(x, y, z))));
         btScalar mass = 1;
         btVector3 sphereInertia = btVector3(0,0,0);
@@ -185,11 +242,41 @@ void PhysicsBody::InitialisePhysicsMesh()
     }
 }
 
+void PhysicsBody::InitialiseInternalConstraints()
+{
+    int i=0;
+    for(auto sphere1 : m_initSpheres)
+    {
+        int j=0;
+        for(auto sphere2 : m_initSpheres)
+        {
+            if (sphere1 == sphere2)
+            {
+                continue;
+            }
+
+
+            float r1 = dynamic_cast<btSphereShape*>(m_collisionShapes[i])->getRadius();
+            float r2 = dynamic_cast<btSphereShape*>(m_collisionShapes[j])->getRadius();
+
+            if(glm::distance(sphere1, sphere2)-(r1+r2) <= 0.0 )
+            {
+                //std::cout<<"Make constraint\n";
+                m_internalConstraints.push_back(new btPoint2PointConstraint(*m_rigidBodies[i], *m_rigidBodies[j], btVector3(sphere1.x,sphere1.y,sphere1.z), btVector3(sphere2.x,sphere2.y,sphere2.z)));
+            }
+
+
+            j++;
+        }
+        i++;
+    }
+}
+
 void PhysicsBody::InitialiseRenderSpheres()
 {
 
     m_shaderProg->bind();
-    glUniform3fv(m_colourLoc, 1, &m_colour[0]);
+    glUniform3fv(m_colourLoc, 1, &m_physicsBodyProperties->colour[0]);
 
     m_sphereVAO.create();
     m_sphereVAO.bind();
@@ -322,14 +409,22 @@ void PhysicsBody::AppendSphereVerts(glm::vec3 _pos, float _radius, int _stacks, 
 
 void PhysicsBody::DrawMesh()
 {
+    if(!m_physicsBodyProperties->drawMesh){return;}
+
+    glUniform3fv(m_colourLoc, 1, &m_physicsBodyProperties->colour[0]);
+
     m_meshVAO.bind();
-    glDrawElements(GL_TRIANGLES, m_meshElementIndex.size(), GL_UNSIGNED_INT, &m_meshElementIndex[0]);
+    glDrawElements(m_wireframe?GL_LINES:GL_TRIANGLES, 3*m_meshElementIndex.size(), GL_UNSIGNED_INT, &m_meshElementIndex[0]);
     m_meshVAO.release();
 }
 
 
 void PhysicsBody::DrawSpheres()
 {
+    if(!m_physicsBodyProperties->drawSpheres){return;}
+
+    glUniform3fv(m_colourLoc, 1, &m_physicsBodyProperties->colour[0]);
+
     // iterate through rigid bodies and update m_sphereModelMats
     int i=0;
     for( auto rb : m_rigidBodies)
@@ -338,7 +433,7 @@ void PhysicsBody::DrawSpheres()
         rb->getMotionState()->getWorldTransform(worldTransform);
         worldTransform.getOpenGLMatrix(&m_sphereModelMats[i][0][0]);
         float r = dynamic_cast<btSphereShape*>(m_collisionShapes[i])->getRadius();
-        m_sphereModelMats[i] = glm::scale(m_sphereModelMats[i], glm::vec3(r, r, r));
+        m_sphereModelMats[i] = m_modelMat * glm::scale(m_sphereModelMats[i], glm::vec3(r, r, r));
         i++;
     }
 
@@ -390,4 +485,16 @@ void PhysicsBody::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
     {
         _dynamicWorld->addRigidBody(rb, 1<<m_id, ~(1<<m_id));
     }
+
+    for( auto ic : m_internalConstraints)
+    {
+        _dynamicWorld->addConstraint(ic, true);
+    }
 }
+
+
+void PhysicsBody::ToggleRenderMode()
+{
+    m_wireframe = !m_wireframe;
+}
+
