@@ -96,7 +96,7 @@ private:
     std::vector<btDefaultMotionState*> m_motionStates;
     std::vector<btCollisionShape*> m_collisionShapes;
     std::vector<btRigidBody*> m_rigidBodies;
-    std::vector<btPoint2PointConstraint*> m_internalConstraints;
+    std::vector<btTypedConstraint*> m_internalConstraints;
     std::vector<openvdb::Vec4s> m_spheres;
     std::vector<glm::vec3> m_initSpheres;
     PhysicsBodyProperties *m_physicsBodyProperties;

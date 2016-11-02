@@ -216,7 +216,7 @@ void PhysicsBody::InitialiseSphericalRigidbodies()
     grid = openvdb::tools::meshToVolume<openvdb::FloatGrid>(mesh, *xform);
 
     // Fill volume with spheres
-    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, m_spheres, 100, false, 0.1f,10.0);
+    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, m_spheres, 1000, false, 0.1f,10.0);
 
     // create rigidbody for each sphere and set sphere rendering model matrix
     AppendSphereVerts(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
@@ -231,10 +231,10 @@ void PhysicsBody::InitialiseSphericalRigidbodies()
         m_collisionShapes.push_back(new btSphereShape(r));
         m_collisionShapes.back()->setUserPointer((void*)this);
         m_motionStates.push_back(new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(x, y, z))));
-        btScalar mass = 1;
+        btScalar mass = 1.0f;
         btVector3 sphereInertia = btVector3(0,0,0);
         m_collisionShapes.back()->calculateLocalInertia(mass,sphereInertia);
-        btRigidBody::btRigidBodyConstructionInfo sphereRBCI(mass, m_motionStates.back(), m_collisionShapes.back(), sphereInertia);
+        btRigidBody::btRigidBodyConstructionInfo sphereRBCI((4.0/3.0) * M_PI * r*r*r* mass, m_motionStates.back(), m_collisionShapes.back(), sphereInertia);
 
 
         m_rigidBodies.push_back(new btRigidBody(sphereRBCI));
@@ -245,10 +245,10 @@ void PhysicsBody::InitialiseSphericalRigidbodies()
 void PhysicsBody::InitialiseInternalConstraints()
 {
     int i=0;
-    for(auto sphere1 : m_initSpheres)
+    for(auto sphere1 : m_rigidBodies)
     {
         int j=0;
-        for(auto sphere2 : m_initSpheres)
+        for(auto sphere2 : m_rigidBodies)
         {
             if (sphere1 == sphere2)
             {
@@ -256,13 +256,36 @@ void PhysicsBody::InitialiseInternalConstraints()
             }
 
 
-            float r1 = dynamic_cast<btSphereShape*>(m_collisionShapes[i])->getRadius();
-            float r2 = dynamic_cast<btSphereShape*>(m_collisionShapes[j])->getRadius();
+            btTransform trans1, trans2;
+            sphere1->getMotionState()->getWorldTransform(trans1);
+            sphere2->getMotionState()->getWorldTransform(trans2);
+            btVector3 pos1 = trans1.getOrigin();
+            btVector3 pos2 = trans2.getOrigin();
+            float r1 = dynamic_cast<btSphereShape*>(sphere1->getCollisionShape())->getRadius();
+            float r2 = dynamic_cast<btSphereShape*>(sphere2->getCollisionShape())->getRadius();
 
-            if(glm::distance(sphere1, sphere2)-(r1+r2) <= 0.0 )
+
+            if(pos1.distance(pos2)-(r1+r2) <= 0.1 )
             {
-                //std::cout<<"Make constraint\n";
-                m_internalConstraints.push_back(new btPoint2PointConstraint(*m_rigidBodies[i], *m_rigidBodies[j], btVector3(sphere1.x,sphere1.y,sphere1.z), btVector3(sphere2.x,sphere2.y,sphere2.z)));
+                btTransform localA, localB;
+                localA.setIdentity();
+                localB.setIdentity();
+
+                btVector3 d = pos2 - pos1;
+
+                localA.setOrigin(r1*d);
+                localA.setOrigin(-r2*d);
+
+                //m_internalConstraints.push_back(new btSliderConstraint(*m_rigidBodies[i], *m_rigidBodies[j], localA, localB, false));
+                //m_internalConstraints.push_back(new btPoint2PointConstraint(*sphere1, *sphere2, pos1, pos2));
+                m_internalConstraints.push_back(new btGeneric6DofSpringConstraint(*sphere1, *sphere2, trans1, trans2, true));
+                m_internalConstraints.back()->setBreakingImpulseThreshold(1000.0f);
+                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setLinearLowerLimit(d);
+                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setLinearUpperLimit(d);
+                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setAngularLowerLimit(btVector3( 0.0,0.0,0.0 ));
+                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setAngularUpperLimit(btVector3( 0.0,0.0,0.0 ));
+
+
             }
 
 
@@ -483,12 +506,12 @@ void PhysicsBody::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
 {
     for( auto rb : m_rigidBodies)
     {
-        _dynamicWorld->addRigidBody(rb, 1<<m_id, ~(1<<m_id));
+        _dynamicWorld->addRigidBody(rb);//, 1<<m_id, ~(1<<m_id));
     }
 
     for( auto ic : m_internalConstraints)
     {
-        _dynamicWorld->addConstraint(ic, true);
+        _dynamicWorld->addConstraint(ic);
     }
 }
 

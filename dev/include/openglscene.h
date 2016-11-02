@@ -10,6 +10,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QTimer>
 
 // GLM includes
 #include <glm/glm.hpp>
@@ -46,6 +47,7 @@ public slots:
     void setYTranslation(int y);
     void setZTranslation(int z);
     void cleanup();
+    void updateSimulation();
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -98,8 +100,10 @@ private:
     btCollisionShape *m_groundShape;
     btDefaultMotionState *m_groundMotionState;
     btRigidBody *m_groundRB;
-
     std::vector<PhysicsBody*> m_physicsBodies;
+
+    QTimer *m_physicsTimer;
+    float m_dt;
 
 
 public:

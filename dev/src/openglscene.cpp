@@ -28,6 +28,10 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     m_runSim = false;
     m_physicsBodies.clear();
     initializePhysicsWorld();
+
+    m_dt = 0.016f;
+    m_physicsTimer = new QTimer(this);
+    connect(m_physicsTimer, SIGNAL(timeout()), this, SLOT(updateSimulation()));
 }
 
 
@@ -303,6 +307,8 @@ void OpenGLScene::initializeGL()
     initializeGroundPlane();
 
     m_shaderProg->release();
+
+    m_physicsTimer->start((int)(m_dt * 1000));
 }
 
 
@@ -353,13 +359,16 @@ void OpenGLScene::paintGL()
 
     m_shaderProg->release();
 
+}
+
+void OpenGLScene::updateSimulation()
+{
     if(m_runSim)
     {
-        m_dynamicWorld->stepSimulation(1/60.0f, 10);
+        m_dynamicWorld->stepSimulation(m_dt, 10);
         update();
     }
 }
-
 
 //--------------------------------------------------------------------------------------------------
 // Qt methods
