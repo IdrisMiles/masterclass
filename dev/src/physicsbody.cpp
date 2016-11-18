@@ -216,7 +216,7 @@ void PhysicsBody::InitialiseSphericalRigidbodies()
     grid = openvdb::tools::meshToVolume<openvdb::FloatGrid>(mesh, *xform);
 
     // Fill volume with spheres
-    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, m_spheres, 1000, false, 0.1f,10.0);
+    openvdb::tools::fillWithSpheres<openvdb::FloatGrid>(*grid, m_spheres, 1000, false, 1.0f,5.0);
 
     // create rigidbody for each sphere and set sphere rendering model matrix
     AppendSphereVerts(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
@@ -234,7 +234,7 @@ void PhysicsBody::InitialiseSphericalRigidbodies()
         btScalar mass = 1.0f;
         btVector3 sphereInertia = btVector3(0,0,0);
         m_collisionShapes.back()->calculateLocalInertia(mass,sphereInertia);
-        btRigidBody::btRigidBodyConstructionInfo sphereRBCI((4.0/3.0) * M_PI * r*r*r* mass, m_motionStates.back(), m_collisionShapes.back(), sphereInertia);
+        btRigidBody::btRigidBodyConstructionInfo sphereRBCI(/*(4.0/3.0) * M_PI * r*r*r**/ mass, m_motionStates.back(), m_collisionShapes.back(), sphereInertia);
 
 
         m_rigidBodies.push_back(new btRigidBody(sphereRBCI));
@@ -244,47 +244,59 @@ void PhysicsBody::InitialiseSphericalRigidbodies()
 
 void PhysicsBody::InitialiseInternalConstraints()
 {
+    int constraintCheck[m_rigidBodies.size()][m_rigidBodies.size()];
     int i=0;
     for(auto sphere1 : m_rigidBodies)
     {
         int j=0;
         for(auto sphere2 : m_rigidBodies)
         {
-            if (sphere1 == sphere2)
+            if (sphere1 == sphere2)// || constraintCheck[j][i])
             {
                 continue;
             }
 
 
-            btTransform trans1, trans2;
-            sphere1->getMotionState()->getWorldTransform(trans1);
-            sphere2->getMotionState()->getWorldTransform(trans2);
-            btVector3 pos1 = trans1.getOrigin();
-            btVector3 pos2 = trans2.getOrigin();
+            btTransform frameInA, frameInB;
+            frameInA.setIdentity();
+            frameInB.setIdentity();
+
+            sphere1->getMotionState()->getWorldTransform(frameInA);
+            sphere2->getMotionState()->getWorldTransform(frameInB);
+
+            btVector3 pos1 = frameInA.getOrigin();
+            btVector3 pos2 = frameInB.getOrigin();
+
             float r1 = dynamic_cast<btSphereShape*>(sphere1->getCollisionShape())->getRadius();
             float r2 = dynamic_cast<btSphereShape*>(sphere2->getCollisionShape())->getRadius();
 
 
-            if(pos1.distance(pos2)-(r1+r2) <= 0.1 )
+            float dist = pos1.distance(pos2);
+            if(dist < 2*(r1+r2))
             {
-                btTransform localA, localB;
-                localA.setIdentity();
-                localB.setIdentity();
+                btTransform invCentreOfMassB = sphere2->getCenterOfMassTransform().inverse();
+                btTransform globalFrameA = sphere1->getCenterOfMassTransform() * frameInA;
+                frameInB = invCentreOfMassB * globalFrameA;
 
-                btVector3 d = pos2 - pos1;
 
-                localA.setOrigin(r1*d);
-                localA.setOrigin(-r2*d);
+//                m_internalConstraints.push_back(new btSliderConstraint(*m_rigidBodies[i], *m_rigidBodies[j], localA, localB, false));
+//                m_internalConstraints.push_back(new btPoint2PointConstraint(*sphere1, *sphere2, pos1, pos2));
 
-                //m_internalConstraints.push_back(new btSliderConstraint(*m_rigidBodies[i], *m_rigidBodies[j], localA, localB, false));
-                //m_internalConstraints.push_back(new btPoint2PointConstraint(*sphere1, *sphere2, pos1, pos2));
-                m_internalConstraints.push_back(new btGeneric6DofSpringConstraint(*sphere1, *sphere2, trans1, trans2, true));
-                m_internalConstraints.back()->setBreakingImpulseThreshold(1000.0f);
-                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setLinearLowerLimit(d);
-                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setLinearUpperLimit(d);
-                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setAngularLowerLimit(btVector3( 0.0,0.0,0.0 ));
-                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setAngularUpperLimit(btVector3( 0.0,0.0,0.0 ));
 
+//                m_internalConstraints.push_back(new btGeneric6DofSpringConstraint(*sphere1, *sphere2, frameInA, frameInB, true));
+//                m_internalConstraints.back()->setBreakingImpulseThreshold(100000.0f);
+//                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setLinearLowerLimit(btVector3(dist, dist, dist));
+//                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setLinearUpperLimit(btVector3(dist, dist, dist));
+//                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setAngularLowerLimit(btVector3( 0.0,0.0,0.0 ));
+//                dynamic_cast<btGeneric6DofSpringConstraint*>(m_internalConstraints.back())->setAngularUpperLimit(btVector3( 0.0,0.0,0.0 ));
+
+
+
+
+                btFixedConstraint *constraint = new btFixedConstraint(*sphere1, *sphere2, frameInA, frameInB);
+                m_internalConstraints.push_back(constraint);
+
+                constraintCheck[i][j] = 1;
 
             }
 
@@ -437,7 +449,10 @@ void PhysicsBody::DrawMesh()
     glUniform3fv(m_colourLoc, 1, &m_physicsBodyProperties->colour[0]);
 
     m_meshVAO.bind();
-    glDrawElements(m_wireframe?GL_LINES:GL_TRIANGLES, 3*m_meshElementIndex.size(), GL_UNSIGNED_INT, &m_meshElementIndex[0]);
+
+    glPolygonMode(GL_FRONT_AND_BACK, m_wireframe?GL_LINE:GL_FILL);
+    glDrawElements(GL_TRIANGLES, 3*m_meshElementIndex.size(), GL_UNSIGNED_INT, &m_meshElementIndex[0]);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     m_meshVAO.release();
 }
 
@@ -506,7 +521,7 @@ void PhysicsBody::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
 {
     for( auto rb : m_rigidBodies)
     {
-        _dynamicWorld->addRigidBody(rb);//, 1<<m_id, ~(1<<m_id));
+        _dynamicWorld->addRigidBody(rb, 1<<m_id, ~(1<<m_id));
     }
 
     for( auto ic : m_internalConstraints)
