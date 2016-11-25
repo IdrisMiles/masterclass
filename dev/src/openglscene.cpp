@@ -1,4 +1,4 @@
-#include "openglscene.h"
+#include "include/Visualisation/openglscene.h"
 
 #include <iostream>
 
@@ -26,7 +26,7 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     setFocusPolicy(Qt::StrongFocus);
 
     m_runSim = false;
-    m_physicsBodies.clear();
+    m_simObjects.clear();
     initializePhysicsWorld();
 
     m_dt = 0.016f;
@@ -136,11 +136,11 @@ void OpenGLScene::cleanPhysicsWorld()
     m_dynamicWorld->removeRigidBody(m_groundRB);
 
     // clean physics bodies
-    for(auto&& bodies : m_physicsBodies)
+    for(auto&& simObj : m_simObjects)
     {
-        delete bodies;
+        delete simObj;
     }
-    m_physicsBodies.clear();
+    m_simObjects.clear();
 
 
     // free physics memory
@@ -159,12 +159,12 @@ void OpenGLScene::cleanPhysicsWorld()
 //--------------------------------------------------------------------------------------------------
 // Initialization and loading methods
 
-void OpenGLScene::loadPhysicsBody(const std::string &_file, PhysicsBodyProperties *_properties)
+void OpenGLScene::loadSimObject(const std::string &_file, std::shared_ptr<PhysicsBodyProperties> _properties)
 {
     makeCurrent();
-    m_physicsBodies.push_back(new PhysicsBody(m_physicsBodies.size(), m_shaderProg, _properties));
-    m_physicsBodies.back()->LoadMesh(_file);
-    m_physicsBodies.back()->AddToDynamicWorld(m_dynamicWorld);
+    m_simObjects.push_back(new SimObject(m_simObjects.size(), m_shaderProg, _properties));
+    m_simObjects.back()->LoadMesh(_file);
+    m_simObjects.back()->AddToDynamicWorld(m_dynamicWorld);
     doneCurrent();
     update();
 }
@@ -349,10 +349,9 @@ void OpenGLScene::paintGL()
     // Draw code
     drawGroundPlane();
 
-    for(auto&& body : m_physicsBodies)
+    for(auto&& simObj : m_simObjects)
     {
-        body->DrawMesh();
-        body->DrawSpheres();
+        simObj->Draw();
     }
     //---------------------------------------------------------------------------------------
 
@@ -404,13 +403,6 @@ void OpenGLScene::keyPressEvent(QKeyEvent *event)
         m_runSim = !m_runSim;
     }
 
-    if(event->key() == Qt::Key_W)
-    {
-        for(auto rb : m_physicsBodies)
-        {
-            rb->ToggleRenderMode();
-        }
-    }
     update();
 
 }

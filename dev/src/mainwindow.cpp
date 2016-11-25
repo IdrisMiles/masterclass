@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "include/UserInterface/mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QGridLayout>
@@ -44,10 +44,9 @@ void MainWindow::AddSimObject()
     boost::filesystem::path f = file.toStdString();
 
 
-
     int id = m_propertiesTab->addTab(new PhysicsBodyPropertiesWidget(m_propertiesTab), QString(f.stem().c_str()));
     PhysicsBodyPropertiesWidget *pbWidget = dynamic_cast<PhysicsBodyPropertiesWidget*>(m_propertiesTab->widget(id));
-    m_glScene->loadPhysicsBody(file.toStdString(), pbWidget->m_physicsProps);
+    m_glScene->loadSimObject(file.toStdString(), pbWidget->m_physicsProps);
     pbWidget->ConnectWithOpenGLScene(m_glScene);
 
 }
