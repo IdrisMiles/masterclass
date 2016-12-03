@@ -25,13 +25,19 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     setFocus();
     setFocusPolicy(Qt::StrongFocus);
 
+
+
     m_runSim = false;
+    m_cache = false;
+
     m_simObjects.clear();
     initializePhysicsWorld();
 
     m_dt = 0.016f;
     m_physicsTimer = new QTimer(this);
     connect(m_physicsTimer, SIGNAL(timeout()), this, SLOT(updateSimulation()));
+
+    m_glInit = false;
 }
 
 
@@ -136,10 +142,10 @@ void OpenGLScene::cleanPhysicsWorld()
     m_dynamicWorld->removeRigidBody(m_groundRB);
 
     // clean physics bodies
-    for(auto&& simObj : m_simObjects)
-    {
-        delete simObj;
-    }
+//    for(auto&& simObj : m_simObjects)
+//    {
+//        delete simObj;
+//    }
     m_simObjects.clear();
 
 
@@ -159,10 +165,10 @@ void OpenGLScene::cleanPhysicsWorld()
 //--------------------------------------------------------------------------------------------------
 // Initialization and loading methods
 
-void OpenGLScene::loadSimObject(const std::string &_file, std::shared_ptr<PhysicsBodyProperties> _properties)
+void OpenGLScene::loadSimObject(const std::string &_file, std::shared_ptr<SimObjectProperties> _properties)
 {
     makeCurrent();
-    m_simObjects.push_back(new SimObject(m_simObjects.size(), m_shaderProg, _properties));
+    m_simObjects.push_back(std::shared_ptr<SimObject>(new SimObject(m_simObjects.size(), m_shaderProg, _properties)));
     m_simObjects.back()->LoadMesh(_file);
     m_simObjects.back()->AddToDynamicWorld(m_dynamicWorld);
     doneCurrent();
@@ -211,7 +217,7 @@ void OpenGLScene::initializePhysicsWorld()
     m_groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
     btRigidBody::btRigidBodyConstructionInfo groundRBCI(0.0f, m_groundMotionState, m_groundShape, btVector3(0,0,0));
     m_groundRB = new btRigidBody(groundRBCI);
-    m_dynamicWorld->addRigidBody(m_groundRB);
+    m_dynamicWorld->addRigidBody(m_groundRB, 1 << 0, ~(1 << 0));
 }
 
 void OpenGLScene::initializeGroundPlane()
@@ -275,6 +281,7 @@ void OpenGLScene::initializeGroundPlane()
 
 void OpenGLScene::initializeGL()
 {
+    m_glInit = true;
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &OpenGLScene::cleanup);
     glewInit();
 
@@ -366,7 +373,17 @@ void OpenGLScene::updateSimulation()
     {
         m_dynamicWorld->stepSimulation(m_dt, 10);
         update();
+
+        if(m_cache)
+        {
+            CacheSim();
+        }
     }
+}
+
+void OpenGLScene::CacheSim()
+{
+
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -401,6 +418,14 @@ void OpenGLScene::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_P)
     {
         m_runSim = !m_runSim;
+    }
+
+    if(event->key() == Qt::Key_R)
+    {
+        for(auto&& simObj : m_simObjects)
+        {
+            simObj->Reset();
+        }
     }
 
     update();

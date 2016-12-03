@@ -1,4 +1,5 @@
 #include "include/UserInterface/mainwindow.h"
+#include "include/UserInterface/simobjectpropertywidget.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QGridLayout>
@@ -14,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_glScene = new OpenGLScene(this);
     m_propertiesGroupbox = new QGroupBox("Properties" ,this);
     m_propertiesTab = new QTabWidget(m_propertiesGroupbox);
-
 
     // Add OpenGLScene widget
     ui->gridLayout->addWidget(m_glScene, 0, 0, 2, 2);
@@ -33,6 +33,15 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+    delete m_glScene;
+
+}
+
+
+
 void MainWindow::AddSimObject()
 {
     QString file = QFileDialog::getOpenFileName(this,QString("Open File"), QString("./"), QString("3D files (*.abc *.obj)"));
@@ -44,19 +53,10 @@ void MainWindow::AddSimObject()
     boost::filesystem::path f = file.toStdString();
 
 
-    int id = m_propertiesTab->addTab(new PhysicsBodyPropertiesWidget(m_propertiesTab), QString(f.stem().c_str()));
-    PhysicsBodyPropertiesWidget *pbWidget = dynamic_cast<PhysicsBodyPropertiesWidget*>(m_propertiesTab->widget(id));
+    int id = m_propertiesTab->addTab(new SimObjectPropertiesWidget(m_propertiesTab), QString(f.stem().c_str()));
+    SimObjectPropertiesWidget *pbWidget = dynamic_cast<SimObjectPropertiesWidget*>(m_propertiesTab->widget(id));
     m_glScene->loadSimObject(file.toStdString(), pbWidget->m_physicsProps);
     pbWidget->ConnectWithOpenGLScene(m_glScene);
+    pbWidget->ConnectWithSimObject(m_glScene->GetPhysicsBody(m_glScene->NumPhysicsBodies()-1));
 
 }
-
-
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-    delete m_glScene;
-
-}
-

@@ -34,8 +34,8 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
-    void loadSimObject(const std::string &_file, std::shared_ptr<PhysicsBodyProperties> _properties = nullptr);
-    SimObject* GetPhysicsBody(const unsigned &_i = 0) {return  (_i<m_simObjects.size())?m_simObjects[_i]:NULL;}
+    void loadSimObject(const std::string &_file, std::shared_ptr<SimObjectProperties> _properties = nullptr);
+    std::shared_ptr<SimObject> GetPhysicsBody(const unsigned &_i = 0) {return  (_i<m_simObjects.size())?m_simObjects[_i]:NULL;}
     int NumPhysicsBodies()const {return m_simObjects.size();}
 
 public slots:
@@ -48,6 +48,7 @@ public slots:
     void setZTranslation(int z);
     void cleanup();
     void updateSimulation();
+
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -62,6 +63,7 @@ private:
     void cleanPhysicsWorld();
     void initializeGroundPlane();
     void drawGroundPlane();
+    void CacheSim();
 
     int m_xRot;
     int m_yRot;
@@ -100,10 +102,13 @@ private:
     btCollisionShape *m_groundShape;
     btDefaultMotionState *m_groundMotionState;
     btRigidBody *m_groundRB;
-    std::vector<SimObject*> m_simObjects;
+    std::vector<std::shared_ptr<SimObject>> m_simObjects;
 
+    bool m_glInit;
     QTimer *m_physicsTimer;
     float m_dt;
+
+    bool m_cache;
 
 
 public:

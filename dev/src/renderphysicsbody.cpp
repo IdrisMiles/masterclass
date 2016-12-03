@@ -1,5 +1,4 @@
 #include "include/Visualisation/renderphysicsbody.h"
-
 #include <glm/gtx/transform.hpp>
 
 
@@ -23,14 +22,13 @@ RenderPhysicsBody::~RenderPhysicsBody()
     m_shaderProg = 0;
 }
 
-void RenderPhysicsBody::LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_shaderProg)
-{
-
-}
-
-void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres, QOpenGLShaderProgram *_shaderProg)
+void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
 {
     m_meshLoaded = true;
+    if(m_physicsBodyProperties)
+    {
+        m_physicsBodyProperties = _physicsBodyProperties;
+    }
 
     if(_shaderProg != 0)
     {
@@ -42,8 +40,21 @@ void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres, QOpe
     m_drawMesh = true;
     m_colour = glm::vec3(0.8f,0.4f,0.4f);
 
+
     //----------------------------------------------------------------------
     // Initialise mesh
+    std::vector<glm::vec4> spheres;
+    _physBody.GetSpheres(spheres);
+    LoadSpheres(spheres);
+
+
+    //----------------------------------------------------------------------
+    // Iitialise GL VAO and buffers
+    InitVAO();
+}
+
+void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres)
+{
     AppendSphereVerts(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
     for(auto sphere : _spheres)
     {
@@ -55,11 +66,6 @@ void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres, QOpe
         m_sphereRad.push_back(r);
         m_sphereModelMats.push_back(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)), glm::vec3(r, r, r)));
     }
-
-    //----------------------------------------------------------------------
-    // Iitialise GL VAO and buffers
-    InitVAO();
-
 }
 
 void RenderPhysicsBody::DrawMesh()
@@ -79,6 +85,13 @@ void RenderPhysicsBody::DrawMesh()
 
 }
 
+void RenderPhysicsBody::UpdateMesh(const PhysicsBody &_physBody)
+{
+
+    std::vector<glm::mat4> sphereMats;
+    _physBody.GetSpheresMatrices(sphereMats);
+    UpdateSphereMats(sphereMats);
+}
 
 void RenderPhysicsBody::UpdateSphereMats(const std::vector<glm::mat4> &_sphereMats)
 {
@@ -86,7 +99,6 @@ void RenderPhysicsBody::UpdateSphereMats(const std::vector<glm::mat4> &_sphereMa
     {
         float r = m_sphereRad[i];
         m_sphereModelMats[i] = m_modelMat * glm::scale(_sphereMats[i], glm::vec3(r, r, r));
-        i++;
     }
 }
 

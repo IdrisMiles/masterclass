@@ -2,6 +2,7 @@
 #define RENDERPHYSICSBODY_H
 
 #include "include/Visualisation/rendermesh.h"
+#include "include/Physics/physicsbody.h"
 
 class RenderPhysicsBody : public RenderMesh
 {
@@ -9,14 +10,14 @@ public:
     RenderPhysicsBody(QOpenGLShaderProgram *_shaderProg = 0);
     virtual ~RenderPhysicsBody();
 
-    virtual void LoadMesh(const std::string _meshFile, QOpenGLShaderProgram *_shaderProg = 0);
-    void LoadSpheres(const std::vector<glm::vec4> &_spheres, QOpenGLShaderProgram *_shaderProg = 0);
+    virtual void LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg = 0, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
     virtual void DrawMesh() override;
-    void UpdateSphereMats(const std::vector<glm::mat4> &_sphereMats);
-
+    void UpdateMesh(const PhysicsBody &_physBody);
 
 protected:
     virtual void InitVAO() override;
+    void LoadSpheres(const std::vector<glm::vec4> &_spheres);
+    void UpdateSphereMats(const std::vector<glm::mat4> &_sphereMats);
     void AppendSphereVerts(glm::vec3 _pos = glm::vec3(0.0f,0.0f,0.0f), float _radius = 1.0f, int _stacks = 16, int _slices = 32);
 
 
