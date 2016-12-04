@@ -63,6 +63,7 @@ void SimObject::Cache()
 void SimObject::UpdatePhysicsProps()
 {
     m_physBody.UpdatePhysicsProps();
+    m_physMesh.UpdatePhysicsProps(m_physBody);
 }
 
 void SimObject::UpdateRenderProps()

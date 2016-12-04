@@ -13,12 +13,14 @@ public:
     virtual void LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg = 0, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
     virtual void DrawMesh() override;
     void UpdateMesh(const PhysicsBody &_physBody);
+    void UpdatePhysicsProps(const PhysicsBody &_physBody);
 
 protected:
     virtual void InitVAO() override;
     void LoadSpheres(const std::vector<glm::vec4> &_spheres);
     void UpdateSphereMats(const std::vector<glm::mat4> &_sphereMats);
     void AppendSphereVerts(glm::vec3 _pos = glm::vec3(0.0f,0.0f,0.0f), float _radius = 1.0f, int _stacks = 16, int _slices = 32);
+    void DeleteMesh();
 
 
     std::vector<float> m_sphereRad;

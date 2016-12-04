@@ -19,6 +19,7 @@ public:
         float minSphereRad;
         float maxSphereRad;
         bool overlapSpheres;
+        bool selfCollisions;
         bool reload;
     }PhysBody;
 

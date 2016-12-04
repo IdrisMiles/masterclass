@@ -23,8 +23,8 @@ public:
     PhysicsBody();
     PhysicsBody(const unsigned int _id, std::shared_ptr<SimObjectProperties> _properties = nullptr);
     ~PhysicsBody();
-    void LoadMesh(const std::vector<glm::vec3> &meshVerts, const std::vector<glm::ivec3> &meshTris, std::shared_ptr<SimObjectProperties> _props = 0);
-    void LoadMesh(const Mesh _mesh, std::shared_ptr<SimObjectProperties> _props = 0);
+    void LoadMesh(const std::vector<glm::vec3> &meshVerts, const std::vector<glm::ivec3> &meshTris, std::shared_ptr<SimObjectProperties> _props = nullptr);
+    void LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties> _props = nullptr);
     void AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
     void GetSpheres(std::vector<glm::vec4> &_spheres) const;
     void GetSpheresMatrices(std::vector<glm::mat4> &_sphereMats) const;
@@ -36,7 +36,7 @@ public:
 private:
 
     void InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &meshVerts, const std::vector<glm::ivec3> &meshTris);
-    void InitialiseInternalConstraints(std::shared_ptr<SimObjectProperties> _props = 0);
+    void InitialiseInternalConstraints();
     void AddRigidBodiesToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
     void AddConstraintsToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
     void RemoveRigidBodiesToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
@@ -55,6 +55,7 @@ private:
     std::vector<btRigidBody*> m_rigidBodies;
     std::vector<btTypedConstraint*> m_internalConstraints;
 
+    Mesh m_mesh;
     std::vector<glm::vec4> m_spheres;
     std::shared_ptr<SimObjectProperties> m_physicsBodyProperties;
     btDiscreteDynamicsWorld * m_dynamicWorld;

@@ -25,7 +25,7 @@ RenderPhysicsBody::~RenderPhysicsBody()
 void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
 {
     m_meshLoaded = true;
-    if(m_physicsBodyProperties)
+    if(_physicsBodyProperties != nullptr)
     {
         m_physicsBodyProperties = _physicsBodyProperties;
     }
@@ -87,7 +87,6 @@ void RenderPhysicsBody::DrawMesh()
 
 void RenderPhysicsBody::UpdateMesh(const PhysicsBody &_physBody)
 {
-
     std::vector<glm::mat4> sphereMats;
     _physBody.GetSpheresMatrices(sphereMats);
     UpdateSphereMats(sphereMats);
@@ -233,4 +232,21 @@ void RenderPhysicsBody::AppendSphereVerts(glm::vec3 _pos, float _radius, int _st
         m_meshTris.push_back(tri2);
     }
 
+}
+
+
+void RenderPhysicsBody::DeleteMesh()
+{
+    m_meshLoaded = false;
+
+    m_sphereRad.clear();
+    m_sphereModelMats.clear();
+
+
+}
+
+void RenderPhysicsBody::UpdatePhysicsProps(const PhysicsBody &_physBody)
+{
+    DeleteMesh();
+    LoadMesh(_physBody);
 }

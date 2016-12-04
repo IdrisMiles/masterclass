@@ -31,16 +31,19 @@ void PhysicsBody::LoadMesh(const std::vector<glm::vec3> &meshVerts, const std::v
     {
         // Loading a new mesh/reloading with new properties
         DeleteMesh();
+        m_meshLoaded = false;
     }
 
-    m_meshLoaded = true;
+    m_mesh.verts = meshVerts;
+    m_mesh.tris = meshTris;
 
-    if(_props != 0)
+
+    if(_props != nullptr)
     {
         m_physicsBodyProperties = _props;
     }
 
-    if(m_physicsBodyProperties != 0)
+    if(m_physicsBodyProperties != nullptr)
     {
         InitialiseSphericalRigidbodies(meshVerts, meshTris);
         InitialiseInternalConstraints();
@@ -48,40 +51,46 @@ void PhysicsBody::LoadMesh(const std::vector<glm::vec3> &meshVerts, const std::v
     else
     {
         // Properties have not been set!
-        assert(m_physicsBodyProperties != 0);
+        assert(m_physicsBodyProperties != nullptr);
     }
+
+    m_meshLoaded = true;
 }
 
-void PhysicsBody::LoadMesh(const Mesh _mesh, std::shared_ptr<SimObjectProperties> _props)
+void PhysicsBody::LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties> _props)
 {
     if(m_meshLoaded)
     {
         // Loading a new mesh/reloading with new properties
         DeleteMesh();
+        m_meshLoaded = false;
+    }
+    else
+    {
+        m_mesh = _mesh;
     }
 
-    m_meshLoaded = true;
-
-    if(_props != 0)
+    if(_props != nullptr)
     {
         m_physicsBodyProperties = _props;
     }
 
-    if(m_physicsBodyProperties != 0)
+    if(m_physicsBodyProperties != nullptr)
     {
-        InitialiseSphericalRigidbodies(_mesh.verts, _mesh.tris);
+        InitialiseSphericalRigidbodies(m_mesh.verts, m_mesh.tris);
         InitialiseInternalConstraints();
     }
     else
     {
         // Properties have not been set!
-        assert(m_physicsBodyProperties != 0);
+        assert(m_physicsBodyProperties != nullptr);
     }
+
+    m_meshLoaded = true;
 }
 
 void PhysicsBody::InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &meshVerts, const std::vector<glm::ivec3> &meshTris)
 {
-
     MeshSpherePacker::vdb::PackMeshWithSpheres(m_spheres, meshVerts, meshTris, m_physicsBodyProperties->PhysBody.numSpheres, m_physicsBodyProperties->PhysBody.overlapSpheres, m_physicsBodyProperties->PhysBody.minSphereRad, m_physicsBodyProperties->PhysBody.maxSphereRad);
 
     // create rigidbody for each sphere
@@ -105,7 +114,7 @@ void PhysicsBody::InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &m
     }
 }
 
-void PhysicsBody::InitialiseInternalConstraints(std::shared_ptr<SimObjectProperties> _props)
+void PhysicsBody::InitialiseInternalConstraints()
 {
     int constraintCheck[m_rigidBodies.size()][m_rigidBodies.size()];
     int i=0;
@@ -224,6 +233,8 @@ void PhysicsBody::RemoveConstraintsToDynamicWorld(btDiscreteDynamicsWorld * _dyn
 
 void PhysicsBody::DeleteMesh()
 {
+    m_meshLoaded = false;
+
     RemoveRigidBodiesToDynamicWorld(m_dynamicWorld);
     RemoveConstraintsToDynamicWorld(m_dynamicWorld);
 
@@ -233,11 +244,11 @@ void PhysicsBody::DeleteMesh()
     }
     for(unsigned int i=0; i<m_collisionShapes.size(); ++i)
     {
-        delete m_rigidBodies[i];
+        delete m_collisionShapes[i];
     }
     for(unsigned int i=0; i<m_rigidBodies.size(); ++i)
     {
-        delete m_motionStates[i];
+        delete m_rigidBodies[i];
     }
     for(unsigned int i=0; i<m_internalConstraints.size(); ++i)
     {
@@ -248,6 +259,7 @@ void PhysicsBody::DeleteMesh()
     m_collisionShapes.clear();
     m_rigidBodies.clear();
     m_internalConstraints.clear();
+    m_spheres.clear();
 }
 
 void PhysicsBody::GetSpheres(std::vector<glm::vec4> &_spheres) const
@@ -291,5 +303,8 @@ void PhysicsBody::Cache(CachedSimObject &_cachSim)
 
 void PhysicsBody::UpdatePhysicsProps()
 {
-
+    Reset();
+    DeleteMesh();
+    LoadMesh(m_mesh, m_physicsBodyProperties);
+    AddToDynamicWorld(m_dynamicWorld, m_physicsBodyProperties->PhysBody.selfCollisions);
 }

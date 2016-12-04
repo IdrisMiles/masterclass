@@ -198,8 +198,6 @@ void SimObjectPropertiesWidget::UpdatePhysicsProperties()
     m_physicsProps->PhysBody.reload = false;
 
     emit PhysicsPropertiesUpdated();
-
-    m_simObject->UpdatePhysicsProps();
 }
 
 void SimObjectPropertiesWidget::OnLoadPushButton()
@@ -209,4 +207,6 @@ void SimObjectPropertiesWidget::OnLoadPushButton()
     emit PhysicsBodyPropertiesUpdated();
     emit RenderingPropertiesUpdated();
     emit PhysicsPropertiesUpdated();
+
+    m_simObject->UpdatePhysicsProps();
 }
