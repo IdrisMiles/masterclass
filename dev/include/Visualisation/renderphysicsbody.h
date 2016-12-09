@@ -16,7 +16,6 @@ public:
     void UpdatePhysicsProps(const PhysicsBody &_physBody);
 
 protected:
-    virtual void InitVAO() override;
     void LoadSpheres(const std::vector<glm::vec4> &_spheres);
     void UpdateSphereMats(const std::vector<glm::mat4> &_sphereMats);
     void AppendSphereVerts(glm::vec3 _pos = glm::vec3(0.0f,0.0f,0.0f), float _radius = 1.0f, int _stacks = 16, int _slices = 32);

@@ -50,17 +50,17 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        gridLayout->addItem(horizontalSpacer, 0, 0, 5, 1);
+        gridLayout->addItem(horizontalSpacer, 0, 0, 4, 1);
 
         s_runSimBtn = new QPushButton(centralWidget);
         s_runSimBtn->setObjectName(QStringLiteral("s_runSimBtn"));
 
-        gridLayout->addWidget(s_runSimBtn, 4, 2, 1, 1);
+        gridLayout->addWidget(s_runSimBtn, 3, 1, 1, 1);
 
         s_LoadModel = new QPushButton(centralWidget);
         s_LoadModel->setObjectName(QStringLiteral("s_LoadModel"));
 
-        gridLayout->addWidget(s_LoadModel, 3, 2, 1, 1);
+        gridLayout->addWidget(s_LoadModel, 2, 1, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);

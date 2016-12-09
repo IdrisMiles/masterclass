@@ -9,6 +9,7 @@ RenderPhysicsBody::RenderPhysicsBody(QOpenGLShaderProgram *_shaderProg) : Render
         m_shaderProg = _shaderProg;
     }
     m_meshLoaded = false;
+    m_vaoLoaded = false;
 }
 
 RenderPhysicsBody::~RenderPhysicsBody()
@@ -20,6 +21,7 @@ RenderPhysicsBody::~RenderPhysicsBody()
     m_meshModelMatInstanceBO.destroy();
 
     m_shaderProg = 0;
+    m_physicsBodyProperties = nullptr;
 }
 
 void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
@@ -50,7 +52,15 @@ void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProg
 
     //----------------------------------------------------------------------
     // Iitialise GL VAO and buffers
-    InitVAO();
+    if(!m_vaoLoaded)
+    {
+        CreateVAOs();
+        UpdateVAOs();
+    }
+    else
+    {
+        UpdateVAOs();
+    }
 }
 
 void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres)
@@ -101,72 +111,6 @@ void RenderPhysicsBody::UpdateSphereMats(const std::vector<glm::mat4> &_sphereMa
     }
 }
 
-
-void RenderPhysicsBody::InitVAO()
-{
-    if(m_shaderProg->bind())
-    {
-        m_modelMatrixLoc = m_shaderProg->attributeLocation("modelMatrix");
-        m_colourLoc = m_shaderProg->uniformLocation("colour");
-        glUniform3fv(m_colourLoc, 1, &m_colour[0]);
-
-        m_meshVAO.create();
-        m_meshVAO.bind();
-
-
-        // Setup element array.
-        m_meshIBO.create();
-        m_meshIBO.bind();
-        m_meshIBO.allocate(&m_meshTris[0], m_meshTris.size() * sizeof(glm::ivec3));
-        m_meshIBO.release();
-
-
-        // Setup our vertex buffer object.
-        m_meshVBO.create();
-        m_meshVBO.bind();
-        m_meshVBO.allocate(&m_meshVerts[0], m_meshVerts.size() * sizeof(glm::vec3));
-
-        glEnableVertexAttribArray( 0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::vec3), 0);
-        m_meshVBO.release();
-
-
-        // set up normal buffer object
-        m_meshNBO.create();
-        m_meshNBO.bind();
-        m_meshNBO.allocate(&m_meshNorms[0], m_meshNorms.size() * sizeof(glm::vec3));
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::vec3), 0);
-        m_meshNBO.release();
-
-
-        // set up instance model matrix buffer object
-        m_meshModelMatInstanceBO.create();
-        m_meshModelMatInstanceBO.bind();
-        m_meshModelMatInstanceBO.allocate(&m_sphereModelMats[0], m_sphereModelMats.size() * sizeof(glm::mat4));
-
-        glEnableVertexAttribArray(m_modelMatrixLoc+0);
-        glEnableVertexAttribArray(m_modelMatrixLoc+1);
-        glEnableVertexAttribArray(m_modelMatrixLoc+2);
-        glEnableVertexAttribArray(m_modelMatrixLoc+3);
-        glVertexAttribPointer(m_modelMatrixLoc+0, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), 0);
-        glVertexAttribPointer(m_modelMatrixLoc+1, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), reinterpret_cast<void *>(1 * sizeof(glm::vec4)));
-        glVertexAttribPointer(m_modelMatrixLoc+2, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), reinterpret_cast<void *>(2 * sizeof(glm::vec4)));
-        glVertexAttribPointer(m_modelMatrixLoc+3, 4, GL_FLOAT, GL_FALSE, 1 * sizeof(glm::mat4), reinterpret_cast<void *>(3 * sizeof(glm::vec4)));
-
-        glVertexAttribDivisor(m_modelMatrixLoc+0, 1);
-        glVertexAttribDivisor(m_modelMatrixLoc+1, 1);
-        glVertexAttribDivisor(m_modelMatrixLoc+2, 1);
-        glVertexAttribDivisor(m_modelMatrixLoc+3, 1);
-        m_meshModelMatInstanceBO.release();
-
-
-        m_meshVAO.release();
-
-        m_shaderProg->release();
-    }
-}
 
 void RenderPhysicsBody::AppendSphereVerts(glm::vec3 _pos, float _radius, int _stacks, int _slices)
 {

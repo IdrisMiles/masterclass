@@ -22,11 +22,8 @@ public:
     virtual void LoadMesh(const Mesh _mesh, QOpenGLShaderProgram *_shaderProg = 0, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
     virtual void DrawMesh();
 
+    void InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres);
     void Skin(const std::vector<glm::vec4> &_spheres);
-
-    // Getters
-    virtual void GetMeshVerts(std::vector<glm::vec3> &_outVerts) const;
-    virtual void GetMeshTris(std::vector<glm::ivec3> &_outTris) const;
 
     // Setter
     void SetShaderProg(QOpenGLShaderProgram *_shaderProg);
@@ -37,7 +34,9 @@ public:
 
 protected:
     void LoadWithASSIMP(const std::string _meshFile);
-    virtual void InitVAO();
+    void CreateVAOs();
+    void DeleteVAOs();
+    void UpdateVAOs();
 
 
     std::shared_ptr<SimObjectProperties> m_physicsBodyProperties;
@@ -45,6 +44,8 @@ protected:
     bool m_wireframe;
     bool m_drawMesh;
     bool m_meshLoaded;
+    bool m_vaoLoaded;
+    bool m_skinWeightLoaded;
 
     glm::mat4 m_modelMat;
     glm::vec3 m_colour;

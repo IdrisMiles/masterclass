@@ -1,6 +1,64 @@
 #include "include/UserInterface/simobjectpropertywidget.h"
 
 #include "include/Visualisation/openglscene.h"
+#include <iostream>
+
+
+FixedConstraintWidget::FixedConstraintWidget(QWidget *parent) : QWidget(parent)
+{
+    m_internalSpringBreakingImpulseThresholdLabel = new QLabel("Internal Spring Breaking Threshold", this);
+    m_internalSpringBreakingImpulseThreshold = new QDoubleSpinBox(this);
+    m_internalSpringBreakingImpulseThreshold->setSingleStep(1);
+    m_internalSpringBreakingImpulseThreshold->setMaximum(1000000);
+
+
+    int row = 0;
+    m_layout = new QGridLayout(this);
+
+    m_layout->addWidget(m_internalSpringBreakingImpulseThresholdLabel,row,0,1,1);
+    m_layout->addWidget(m_internalSpringBreakingImpulseThreshold,row++,1,1,1);
+
+    setLayout(m_layout);
+}
+
+FixedConstraintWidget::~FixedConstraintWidget()
+{
+
+}
+
+Generic6DOFSpringConstraintWidget::Generic6DOFSpringConstraintWidget(QWidget *parent) : QWidget(parent)
+{
+    m_internalSpringStiffnessLabel = new QLabel("Internal Spring Stiffness", this);
+    m_internalSpringStiffness = new QDoubleSpinBox(this);
+    m_internalSpringStiffness->setSingleStep(1);
+    m_internalSpringStiffness->setMaximum(1000000);
+    m_internalSpringDampingLabel = new QLabel("Internal Spring Damping", this);
+    m_internalSpringDamping = new QDoubleSpinBox(this);
+    m_internalSpringDamping->setSingleStep(1);
+    m_internalSpringDamping->setMaximum(1000000);
+    m_internalSpringBreakingImpulseThresholdLabel = new QLabel("Internal Spring Breaking Threshold", this);
+    m_internalSpringBreakingImpulseThreshold = new QDoubleSpinBox(this);
+    m_internalSpringBreakingImpulseThreshold->setSingleStep(1);
+    m_internalSpringBreakingImpulseThreshold->setMaximum(1000000);
+
+
+    int row = 0;
+    m_layout = new QGridLayout(this);
+
+    m_layout->addWidget(m_internalSpringStiffnessLabel,row,0,1,1);
+    m_layout->addWidget(m_internalSpringStiffness,row++,1,1,1);
+    m_layout->addWidget(m_internalSpringDampingLabel,row,0,1,1);
+    m_layout->addWidget(m_internalSpringDamping,row++,1,1,1);
+    m_layout->addWidget(m_internalSpringBreakingImpulseThresholdLabel,row,0,1,1);
+    m_layout->addWidget(m_internalSpringBreakingImpulseThreshold,row++,1,1,1);
+
+    setLayout(m_layout);
+}
+
+Generic6DOFSpringConstraintWidget::~Generic6DOFSpringConstraintWidget()
+{
+
+}
 
 
 SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(parent)
@@ -13,6 +71,7 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_drawMesh = new QCheckBox("Draw Mesh", m_renderProps);
     m_drawMeshWireframe = new QCheckBox("Draw Mesh Wireframe", m_renderProps);
     m_drawSpheres = new QCheckBox("Draw Spheres", m_renderProps);
+    m_colourLabel = new QLabel("Colour", m_renderProps);
     m_colour[0] = new QDoubleSpinBox(m_renderProps);
     m_colour[0]->setRange(0.0,1.0);
     m_colour[0]->setSingleStep(0.05);
@@ -22,8 +81,7 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_colour[2] = new QDoubleSpinBox(m_renderProps);
     m_colour[2]->setRange(0.0,1.0);
     m_colour[2]->setSingleStep(0.05);
-    m_mass = new QDoubleSpinBox(m_renderProps);
-    m_youngsModulus = new QDoubleSpinBox(m_renderProps);
+
 
     m_physProps = new QGroupBox("Physics Properties", this);
     m_numSpheresLabel = new QLabel("Num Spheres", m_physProps);
@@ -37,7 +95,20 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_maxSphereRad = new QDoubleSpinBox(m_physProps);
     m_maxSphereRad->setSingleStep(0.1);
     m_overlapSpheres = new QCheckBox("Overlap Spheres", m_physProps);
+    m_massLabel = new QLabel("Mass", m_physProps);
+    m_mass = new QDoubleSpinBox(m_physProps);
+    m_youngsModulusLabel = new QLabel("Youngs Modulus", m_physProps);
+    m_youngsModulus = new QDoubleSpinBox(m_physProps);
+    m_selfCollisions = new QCheckBox("Self Collision", m_physProps);
     m_loadPhysBody = new QPushButton("Load", m_physProps);
+
+    m_fixedConstraintWidget = new FixedConstraintWidget(m_physProps);
+    m_generic6DOFSpringConstraintWidget = new Generic6DOFSpringConstraintWidget(m_physProps);
+
+    m_constraintSelection = new QComboBox(m_physProps);
+    m_constraintSelection->addItem("Fixed");
+    m_constraintSelection->addItem("Generic6DOFSpring");
+
 
     //-----------------------------------------------------------------------------------------
     // Add widgets to layouts
@@ -47,11 +118,10 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_renderPropsLayout->addWidget(m_drawMesh,row++,0,1,1);
     m_renderPropsLayout->addWidget(m_drawMeshWireframe,row++,0,1,1);
     m_renderPropsLayout->addWidget(m_drawSpheres,row++,0,1,1);
-    m_renderPropsLayout->addWidget(m_colour[0],row,0,1,1);
-    m_renderPropsLayout->addWidget(m_colour[1],row,1,1,1);
-    m_renderPropsLayout->addWidget(m_colour[2],row++,2,1,1);
-    m_renderPropsLayout->addWidget(m_mass,row++,0,1,1);
-    m_renderPropsLayout->addWidget(m_youngsModulus,row++,0,1,1);
+    m_renderPropsLayout->addWidget(m_colourLabel, row, 0, 1, 1);
+    m_renderPropsLayout->addWidget(m_colour[0],row,1,1,1);
+    m_renderPropsLayout->addWidget(m_colour[1],row,2,1,1);
+    m_renderPropsLayout->addWidget(m_colour[2],row++,3,1,1);
     m_renderProps->setLayout(m_renderPropsLayout);
 
 
@@ -64,7 +134,15 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_physPropsLayout->addWidget(m_maxSphereRadLabel, row, 0, 1, 1);
     m_physPropsLayout->addWidget(m_maxSphereRad, row++, 1, 1, 1);
     m_physPropsLayout->addWidget(m_overlapSpheres, row++, 0, 1, 1);
+    m_physPropsLayout->addWidget(m_massLabel,row,0,1,1);
+    m_physPropsLayout->addWidget(m_mass,row++,1,1,1);
+    m_physPropsLayout->addWidget(m_youngsModulusLabel,row,0,1,1);
+    m_physPropsLayout->addWidget(m_youngsModulus,row++,1,1,1);
+    m_physPropsLayout->addWidget(m_selfCollisions, row++, 0, 1, 1);
     m_physPropsLayout->addWidget(m_loadPhysBody, row++, 0, 1, 1);
+    m_physPropsLayout->addWidget(m_constraintSelection, row++, 0, 1, 1);
+    m_physPropsLayout->addWidget(m_fixedConstraintWidget, row++, 0, 1, 2);
+    m_physPropsLayout->addWidget(m_generic6DOFSpringConstraintWidget, row++, 0, 1, 2);
     m_physProps->setLayout(m_physPropsLayout);
 
 
@@ -80,9 +158,6 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     // Initialise render properties
     m_physicsProps = std::shared_ptr<SimObjectProperties>(new SimObjectProperties());
     m_physicsProps->RenderMesh.colour = glm::vec3(0.8f,0.4f,0.4f);
-    m_physicsProps->RenderMesh.position = glm::vec3(0,0,0);
-    m_physicsProps->RenderMesh.rotation = glm::vec3(0,0,0);
-    m_physicsProps->RenderMesh.scale = glm::vec3(0,0,0);
     m_physicsProps->RenderMesh.drawMesh = true;
     m_physicsProps->RenderMesh.drawSpheres = true;
 
@@ -91,6 +166,13 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_physicsProps->PhysBody.overlapSpheres = true;
     m_physicsProps->PhysBody.minSphereRad = 1.0f;
     m_physicsProps->PhysBody.maxSphereRad = 5.0f;
+    m_physicsProps->PhysBody.mass = 1.0f;
+    m_physicsProps->PhysBody.youngsModulus = 1.0f;
+    m_physicsProps->PhysBody.constraintType = ConstraintTypes::Fixed;
+    m_physicsProps->PhysBody.internalSpringStiffness = 1.0f;
+    m_physicsProps->PhysBody.internalSpringDamping = 1.0f;
+    m_physicsProps->PhysBody.internalSpringBreakingImpulseThreshold = 1000000.0f;
+    m_physicsProps->PhysBody.selfCollisions = false;
 
     // initalise widgets to property values
     m_drawMesh->setChecked(m_physicsProps->RenderMesh.drawMesh);
@@ -100,6 +182,8 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_minSphereRad->setValue(m_physicsProps->PhysBody.minSphereRad);
     m_maxSphereRad->setValue(m_physicsProps->PhysBody.maxSphereRad);
     m_overlapSpheres->setChecked(m_physicsProps->PhysBody.overlapSpheres);
+    m_selfCollisions->setChecked(m_physicsProps->PhysBody.selfCollisions);
+    m_fixedConstraintWidget->m_internalSpringBreakingImpulseThreshold->setValue(m_physicsProps->PhysBody.internalSpringBreakingImpulseThreshold);
 
     //-----------------------------------------------------------------------------------------
     // Connect widget singal and slots
@@ -112,16 +196,22 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     connect(m_colour[1], SIGNAL(valueChanged(double)), this, SLOT(UpdateRenderingProperties()));
     connect(m_colour[2], SIGNAL(valueChanged(double)), this, SLOT(UpdateRenderingProperties()));
     connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(UpdateRenderingProperties()));
-    connect(m_youngsModulus, SIGNAL(valueChanged(double)), this, SLOT(UpdateRenderingProperties()));
 
     connect(m_numSpheres, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_minSphereRad, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_maxSphereRad, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_overlapSpheres, SIGNAL(clicked(bool)), this, SLOT(UpdatePhysicsProperties()));
-    connect(m_loadPhysBody, SIGNAL(clicked(bool)), this, SLOT(OnLoadPushButton()));
+    connect(m_youngsModulus, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
 
-    // Update
-    UpdatePhysicsBodyProperties();
+    connect(m_fixedConstraintWidget->m_internalSpringBreakingImpulseThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+
+    connect(m_generic6DOFSpringConstraintWidget->m_internalSpringStiffness, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_internalSpringDamping, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_internalSpringBreakingImpulseThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+
+    connect(m_constraintSelection, SIGNAL(currentIndexChanged(QString)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_selfCollisions, SIGNAL(clicked(bool)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_loadPhysBody, SIGNAL(clicked(bool)), this, SLOT(OnLoadPushButton()));
 
 }
 
@@ -143,7 +233,7 @@ SimObjectPropertiesWidget::~SimObjectPropertiesWidget()
 
 void SimObjectPropertiesWidget::ConnectWithOpenGLScene(OpenGLScene *_glScene)
 {
-    connect(this, SIGNAL(PhysicsBodyPropertiesUpdated()), _glScene, SLOT(update()));
+    //connect(this, SIGNAL(PhysicsBodyPropertiesUpdated()), _glScene, SLOT(update()));
 
     connect(this, SIGNAL(RenderingPropertiesUpdated()), _glScene, SLOT(update()));
     //connect(this, SIGNAL(PhysicsPropertiesUpdated()), _glScene, SLOT(update()));
@@ -153,26 +243,6 @@ void SimObjectPropertiesWidget::ConnectWithSimObject(std::shared_ptr<SimObject> 
 {
     m_simObject = _simObject;
     //connect(this, SIGNAL(PhysicsPropertiesUpdated()), _glScene, SLOT(update()));
-}
-
-void SimObjectPropertiesWidget::UpdatePhysicsBodyProperties()
-{
-    m_physicsProps->RenderMesh.drawMesh = m_drawMesh->isChecked();
-    m_physicsProps->RenderMesh.drawWireframe = m_drawMeshWireframe->isChecked();
-    m_physicsProps->RenderMesh.drawSpheres = m_drawSpheres->isChecked();
-    m_physicsProps->RenderMesh.colour = glm::vec3(m_colour[0]->value(), m_colour[1]->value(), m_colour[2]->value());
-    m_drawMeshWireframe->setEnabled(m_drawMesh->isChecked());
-
-    m_physicsProps->PhysBody.numSpheres = (unsigned int)m_numSpheres->value();
-    m_physicsProps->PhysBody.minSphereRad = m_minSphereRad->value();
-    m_physicsProps->PhysBody.maxSphereRad = m_maxSphereRad->value();
-    m_physicsProps->PhysBody.overlapSpheres = m_overlapSpheres->isChecked();
-
-    m_physicsProps->PhysBody.reload = false;
-
-    emit PhysicsBodyPropertiesUpdated();
-    emit RenderingPropertiesUpdated();
-    emit PhysicsPropertiesUpdated();
 }
 
 void SimObjectPropertiesWidget::UpdateRenderingProperties()
@@ -195,7 +265,28 @@ void SimObjectPropertiesWidget::UpdatePhysicsProperties()
     m_physicsProps->PhysBody.maxSphereRad = m_maxSphereRad->value();
     m_physicsProps->PhysBody.overlapSpheres = m_overlapSpheres->isChecked();
 
+
+    m_fixedConstraintWidget->hide();
+    m_generic6DOFSpringConstraintWidget->hide();
+    if(m_constraintSelection->currentText().toStdString() == "Fixed")
+    {
+        m_physicsProps->PhysBody.constraintType = ConstraintTypes::Fixed;
+        m_fixedConstraintWidget->show();
+    }
+    else if(m_constraintSelection->currentText().toStdString() == "Generic6DOFSpring")
+    {
+        m_physicsProps->PhysBody.constraintType = ConstraintTypes::Generic6DOFSpring;
+        m_generic6DOFSpringConstraintWidget->show();
+    }
+    else
+    {
+        m_physicsProps->PhysBody.constraintType = ConstraintTypes::Fixed;
+        m_fixedConstraintWidget->show();
+    }
+
+
     m_physicsProps->PhysBody.reload = false;
+
 
     emit PhysicsPropertiesUpdated();
 }
@@ -204,7 +295,6 @@ void SimObjectPropertiesWidget::OnLoadPushButton()
 {
     m_physicsProps->PhysBody.reload = true;
 
-    emit PhysicsBodyPropertiesUpdated();
     emit RenderingPropertiesUpdated();
     emit PhysicsPropertiesUpdated();
 

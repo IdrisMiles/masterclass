@@ -14,6 +14,7 @@ SimObject::SimObject(const unsigned int _id, QOpenGLShaderProgram *_shaderProg, 
 
 SimObject::~SimObject()
 {
+    m_physicsBodyProperties = nullptr;
 }
 
 void SimObject::LoadMesh(const std::string _meshFile)
@@ -29,6 +30,11 @@ void SimObject::LoadMesh(const std::string _meshFile)
 
     // Load physics mesh to render
     m_physMesh.LoadMesh(m_physBody, 0, m_physicsBodyProperties);
+
+
+    std::vector<glm::vec4> spheres;
+    m_physBody.GetSpheres(spheres);
+    //m_mesh.InitialiseSkinWeights(spheres);
 }
 
 void SimObject::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions)
@@ -36,10 +42,18 @@ void SimObject::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const
     m_physBody.AddToDynamicWorld(_dynamicWorld);
 }
 
+void SimObject::RemoveFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
+{
+    m_physBody.RemoveFromDynamicWorld(_dynamicWorld);
+}
+
 
 void SimObject::Draw()
 {
     // Draw the mesh
+    std::vector<glm::vec4> spheres;
+    m_physBody.GetSpheres(spheres);
+    m_mesh.Skin(spheres);
     m_mesh.DrawMesh();
 
     // Draw the phsyics mesh (spheres)

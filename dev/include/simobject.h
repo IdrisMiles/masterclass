@@ -17,6 +17,7 @@ public:
 
     void LoadMesh(const std::string _meshFile);
     void AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
+    void RemoveFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
     void Draw();
     void Reset();
     void Cache();

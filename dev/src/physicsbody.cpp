@@ -1,5 +1,6 @@
 #include "include/Physics/physicsbody.h"
 #include "include/SpherePacking/meshspherepacker.h"
+#include <float.h>
 
 PhysicsBody::PhysicsBody()
 {
@@ -16,10 +17,34 @@ PhysicsBody::PhysicsBody(const unsigned int _id, std::shared_ptr<SimObjectProper
 
 PhysicsBody::~PhysicsBody()
 {
-    DeleteMesh();
+    for(unsigned int i=0; i<m_motionStates.size(); ++i)
+    {
+        delete m_motionStates[i];
+    }
+
+    for(unsigned int i=0; i<m_collisionShapes.size(); ++i)
+    {
+        delete m_collisionShapes[i];
+    }
+
+    for(unsigned int i=0; i<m_rigidBodies.size(); ++i)
+    {
+        m_rigidBodies[i] = nullptr;
+    }
+
+    for(unsigned int i=0; i<m_internalConstraints.size(); ++i)
+    {
+        delete m_internalConstraints[i];
+    }
+
+    m_motionStates.clear();
+    m_collisionShapes.clear();
+    m_rigidBodies.clear();
+    m_internalConstraints.clear();
+    m_spheres.clear();
 
     m_dynamicWorld = 0;
-    m_physicsBodyProperties = 0;
+    m_physicsBodyProperties = nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------------------------------
@@ -102,84 +127,102 @@ void PhysicsBody::InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &m
         float r = sphere.w;
 
         m_collisionShapes.push_back(new btSphereShape(r));
-        m_collisionShapes.back()->setUserPointer((void*)this);
-        m_motionStates.push_back(new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(x, y, z))));
+        //m_collisionShapes.back()->setUserPointer((void*)this);
+        m_motionStates.push_back(new btDefaultMotionState(btTransform(btQuaternion::getIdentity(), btVector3(x, y, z))));
         btScalar mass = 1.0f;
         btVector3 sphereInertia = btVector3(0,0,0);
         m_collisionShapes.back()->calculateLocalInertia(mass,sphereInertia);
         btRigidBody::btRigidBodyConstructionInfo sphereRBCI(/*(4.0/3.0) * M_PI * r*r*r**/ mass, m_motionStates.back(), m_collisionShapes.back(), sphereInertia);
 
 
-        m_rigidBodies.push_back(new btRigidBody(sphereRBCI));
+        m_rigidBodies.push_back(std::shared_ptr<btRigidBody>(new btRigidBody(sphereRBCI)));
     }
+
+
+    //printf("num rigidbodies: %u\n",m_rigidBodies.size());
 }
 
 void PhysicsBody::InitialiseInternalConstraints()
 {
-    int constraintCheck[m_rigidBodies.size()][m_rigidBodies.size()];
+    bool constraintCheck[m_rigidBodies.size()][m_rigidBodies.size()] = {false};
     int i=0;
     for(auto sphere1 : m_rigidBodies)
     {
         int j=0;
         for(auto sphere2 : m_rigidBodies)
         {
-            if (sphere1 == sphere2 || constraintCheck[j][i])
+            if (sphere1 == sphere2 || constraintCheck[j][i] || constraintCheck[i][j])
             {
+                j++;
                 continue;
             }
-
-
-            btTransform frameInA, frameInB;
-            frameInA.setIdentity();
-            frameInB.setIdentity();
-
-            sphere1->getMotionState()->getWorldTransform(frameInA);
-            sphere2->getMotionState()->getWorldTransform(frameInB);
-
-            btVector3 pos1 = frameInA.getOrigin();
-            btVector3 pos2 = frameInB.getOrigin();
-
-            float r1 = dynamic_cast<btSphereShape*>(sphere1->getCollisionShape())->getRadius();
-            float r2 = dynamic_cast<btSphereShape*>(sphere2->getCollisionShape())->getRadius();
-
-
-            float dist = pos1.distance(pos2);
-            if(dist < 2*(r1+r2))
+            else
             {
-                btTransform invCentreOfMassB = sphere2->getCenterOfMassTransform().inverse();
-                btTransform globalFrameA = sphere1->getCenterOfMassTransform() * frameInA;
-                frameInB = invCentreOfMassB * globalFrameA;
+                AddConstraint(sphere1, sphere2);
 
-
-//                m_internalConstraints.push_back(new btSliderConstraint(*m_rigidBodies[i], *m_rigidBodies[j], localA, localB, false));
-//                m_internalConstraints.push_back(new btPoint2PointConstraint(*sphere1, *sphere2, pos1, pos2));
-
-                /*
-                btGeneric6DofSpringConstraint *constraint = new btGeneric6DofSpringConstraint(*sphere1, *sphere2, frameInA, frameInB, true);
-                constraint->setEquilibriumPoint();
-                constraint->setBreakingImpulseThreshold(100000.0f);
-                constraint->setLinearLowerLimit(btVector3(dist, dist, dist));
-                constraint->setLinearUpperLimit(btVector3(dist, dist, dist));
-                constraint->setAngularLowerLimit(btVector3( 0.0,0.0,0.0 ));
-                constraint->setAngularUpperLimit(btVector3( 0.0,0.0,0.0 ));
-                */
-
-                btFixedConstraint *constraint = new btFixedConstraint(*sphere1, *sphere2, frameInA, frameInB);
-                constraint->setBreakingImpulseThreshold(1000000.0f);
-                m_internalConstraints.push_back(constraint);
-
-                constraintCheck[i][j] = 1;
-                constraintCheck[j][i] = 1;
+                constraintCheck[i][j] = true;
+                constraintCheck[j][i] = true;
+                j++;
             }
-
-
-            j++;
         }
         i++;
     }
+
+    //printf("num constraints: %u\n",m_internalConstraints.size());
 }
 
 
+void PhysicsBody::AddConstraint(std::shared_ptr<btRigidBody> rigidA, std::shared_ptr<btRigidBody> rigidB)
+{
+    btTransform frameInA, frameInB;
+    frameInA.setIdentity();
+    frameInB.setIdentity();
+
+    rigidA->getMotionState()->getWorldTransform(frameInA);
+    rigidB->getMotionState()->getWorldTransform(frameInB);
+
+    btVector3 pos1 = frameInA.getOrigin();
+    btVector3 pos2 = frameInB.getOrigin();
+
+    float r1 = dynamic_cast<btSphereShape*>(rigidA->getCollisionShape())->getRadius();
+    float r2 = dynamic_cast<btSphereShape*>(rigidB->getCollisionShape())->getRadius();
+
+
+    float dist = pos1.distance(pos2);
+    if(dist <= 2.0f*(r1+r2))
+    {
+        btTransform invCentreOfMassB = rigidB->getCenterOfMassTransform().inverse();
+        btTransform globalFrameA = rigidA->getCenterOfMassTransform() * frameInA;
+        frameInB = invCentreOfMassB * globalFrameA;
+
+
+        if (m_physicsBodyProperties->PhysBody.constraintType == ConstraintTypes::Fixed)
+        {
+            btFixedConstraint *constraint = new btFixedConstraint(*rigidA, *rigidB, frameInA, frameInB);
+            constraint->setBreakingImpulseThreshold(m_physicsBodyProperties->PhysBody.internalSpringBreakingImpulseThreshold);
+            m_internalConstraints.push_back(constraint);
+        }
+        else if(m_physicsBodyProperties->PhysBody.constraintType == ConstraintTypes::Generic6DOFSpring)
+        {
+            btGeneric6DofSpringConstraint *constraint = new btGeneric6DofSpringConstraint(*rigidA, *rigidB, frameInA, frameInB, true);
+            constraint->setStiffness(0, 1.0f);
+            constraint->setDamping(0, 1.0f);
+            constraint->setBreakingImpulseThreshold(m_physicsBodyProperties->PhysBody.internalSpringBreakingImpulseThreshold);
+            constraint->setLinearLowerLimit(btVector3(dist-FLT_EPSILON, dist-FLT_EPSILON, dist-FLT_EPSILON));
+            constraint->setLinearUpperLimit(btVector3(dist+FLT_EPSILON, dist+FLT_EPSILON, dist+FLT_EPSILON));
+            constraint->setAngularLowerLimit(btVector3( -FLT_EPSILON, -FLT_EPSILON, -FLT_EPSILON ));
+            constraint->setAngularUpperLimit(btVector3( FLT_EPSILON, FLT_EPSILON, FLT_EPSILON ));
+            m_internalConstraints.push_back(constraint);
+        }
+        else
+        {
+            btFixedConstraint *constraint = new btFixedConstraint(*rigidA, *rigidB, frameInA, frameInB);
+            constraint->setBreakingImpulseThreshold(m_physicsBodyProperties->PhysBody.internalSpringBreakingImpulseThreshold);
+            m_internalConstraints.push_back(constraint);
+        }
+
+    }
+}
 
 //-------------------------------------------------------------------------------------------------------------------------
 // utility methods
@@ -191,43 +234,65 @@ void PhysicsBody::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, con
     AddConstraintsToDynamicWorld(_dynamicWorld, _selfCollisions);
 }
 
+void PhysicsBody::RemoveFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
+{
+    m_dynamicWorld = _dynamicWorld;
+    RemoveRigidBodiesFromDynamicWorld(_dynamicWorld);
+    RemoveConstraintsFromDynamicWorld(_dynamicWorld);
+}
+
 
 void PhysicsBody::AddRigidBodiesToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions)
 {
-    for( auto rb : m_rigidBodies)
+    if(_dynamicWorld != nullptr)
     {
-        if(_selfCollisions)
+        for( auto rb : m_rigidBodies)
         {
-            _dynamicWorld->addRigidBody(rb);
-        }
-        else
-        {
-            _dynamicWorld->addRigidBody(rb, 1<<(m_id+1), ~(1<<(m_id+1)));
+            if(_selfCollisions)
+            {
+                _dynamicWorld->addRigidBody(rb.get());
+            }
+            else
+            {
+                _dynamicWorld->addRigidBody(rb.get(), 1<<(m_id+1), ~(1<<(m_id+1)));
+            }
         }
     }
 }
 
 void PhysicsBody::AddConstraintsToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions)
 {
-    for( auto ic : m_internalConstraints)
+    if(_dynamicWorld != nullptr)
     {
-        _dynamicWorld->addConstraint(ic);
+        for( auto ic : m_internalConstraints)
+        {
+            _dynamicWorld->addConstraint(ic);
+        }
     }
 }
 
-void PhysicsBody::RemoveRigidBodiesToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
+void PhysicsBody::RemoveRigidBodiesFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
 {
-    for( auto rb : m_rigidBodies)
+    if(_dynamicWorld != nullptr)
     {
-        _dynamicWorld->removeRigidBody(rb);
+        for( auto rb : m_rigidBodies)
+        {
+            if(rb != nullptr)
+            {
+                _dynamicWorld->removeRigidBody(rb.get());
+            }
+        }
     }
 }
 
-void PhysicsBody::RemoveConstraintsToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
+void PhysicsBody::RemoveConstraintsFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
 {
-    for( auto ic : m_internalConstraints)
+    if(_dynamicWorld != nullptr)
     {
-        _dynamicWorld->removeConstraint(ic);
+        for( auto ic : m_internalConstraints)
+        {
+            _dynamicWorld->removeConstraint(ic);
+        }
     }
 }
 
@@ -235,21 +300,27 @@ void PhysicsBody::DeleteMesh()
 {
     m_meshLoaded = false;
 
-    RemoveRigidBodiesToDynamicWorld(m_dynamicWorld);
-    RemoveConstraintsToDynamicWorld(m_dynamicWorld);
+    if(m_dynamicWorld != nullptr)
+    {
+        RemoveRigidBodiesFromDynamicWorld(m_dynamicWorld);
+        RemoveConstraintsFromDynamicWorld(m_dynamicWorld);
+    }
 
     for(unsigned int i=0; i<m_motionStates.size(); ++i)
     {
         delete m_motionStates[i];
     }
+
     for(unsigned int i=0; i<m_collisionShapes.size(); ++i)
     {
         delete m_collisionShapes[i];
     }
+
     for(unsigned int i=0; i<m_rigidBodies.size(); ++i)
     {
-        delete m_rigidBodies[i];
+        m_rigidBodies[i] = nullptr;
     }
+
     for(unsigned int i=0; i<m_internalConstraints.size(); ++i)
     {
         delete m_internalConstraints[i];
@@ -304,7 +375,7 @@ void PhysicsBody::Cache(CachedSimObject &_cachSim)
 void PhysicsBody::UpdatePhysicsProps()
 {
     Reset();
-    DeleteMesh();
+    //DeleteMesh();
     LoadMesh(m_mesh, m_physicsBodyProperties);
     AddToDynamicWorld(m_dynamicWorld, m_physicsBodyProperties->PhysBody.selfCollisions);
 }

@@ -7,6 +7,7 @@
 
 
 class OpenGLScene;
+enum ConstraintTypes {Fixed, Generic6DOFSpring};
 
 struct SimObjectProperties
 {
@@ -21,6 +22,15 @@ public:
         bool overlapSpheres;
         bool selfCollisions;
         bool reload;
+
+        float mass;
+        float youngsModulus;
+
+        float internalSpringStiffness;
+        float internalSpringDamping;
+        float internalSpringBreakingImpulseThreshold;
+
+        ConstraintTypes constraintType;
     }PhysBody;
 
 
@@ -28,9 +38,6 @@ public:
     struct RENDERMESH
     {
         glm::vec3 colour;
-        glm::vec3 position;
-        glm::vec3 rotation;
-        glm::vec3 scale;
         bool drawMesh;
         bool drawSpheres;
         bool drawWireframe;

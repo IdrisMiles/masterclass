@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QLabel>
+#include <QComboBox>
 
 #include <glm/glm.hpp>
 
@@ -18,6 +19,39 @@
 
 class OpenGLScene;
 class SimObject;
+
+class FixedConstraintWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    FixedConstraintWidget(QWidget *parent = 0);
+    virtual ~FixedConstraintWidget();
+
+    QGridLayout *m_layout;
+
+    QLabel *m_internalSpringBreakingImpulseThresholdLabel;
+    QDoubleSpinBox *m_internalSpringBreakingImpulseThreshold;
+};
+
+class Generic6DOFSpringConstraintWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Generic6DOFSpringConstraintWidget(QWidget *parent = 0);
+    virtual ~Generic6DOFSpringConstraintWidget();
+
+    QGridLayout *m_layout;
+
+    QLabel *m_internalSpringStiffnessLabel;
+    QDoubleSpinBox *m_internalSpringStiffness;
+    QLabel *m_internalSpringDampingLabel;
+    QDoubleSpinBox *m_internalSpringDamping;
+    QLabel *m_internalSpringBreakingImpulseThresholdLabel;
+    QDoubleSpinBox *m_internalSpringBreakingImpulseThreshold;
+};
+
 
 class SimObjectPropertiesWidget : public QGroupBox
 {
@@ -44,20 +78,27 @@ public:
     QLabel *m_maxSphereRadLabel;
     QDoubleSpinBox *m_maxSphereRad;
     QCheckBox *m_overlapSpheres;
+    QLabel *m_massLabel;
+    QDoubleSpinBox *m_mass;
+    QLabel *m_youngsModulusLabel;
+    QDoubleSpinBox *m_youngsModulus;
+    QCheckBox *m_selfCollisions;
+    FixedConstraintWidget *m_fixedConstraintWidget;
+    Generic6DOFSpringConstraintWidget *m_generic6DOFSpringConstraintWidget;
     QPushButton *m_loadPhysBody;
+    QComboBox *m_constraintSelection;
 
     QGroupBox *m_renderProps;
     QGridLayout *m_renderPropsLayout;
     QCheckBox *m_drawMesh;
     QCheckBox *m_drawMeshWireframe;
     QCheckBox *m_drawSpheres;
+    QLabel *m_colourLabel;
     QDoubleSpinBox *m_colour[3];
-    QDoubleSpinBox *m_mass;
-    QDoubleSpinBox *m_youngsModulus;
 
 
 public slots:
-    void UpdatePhysicsBodyProperties();
+    //void UpdatePhysicsBodyProperties();
     void UpdateRenderingProperties();
     void UpdatePhysicsProperties();
     void OnLoadPushButton();

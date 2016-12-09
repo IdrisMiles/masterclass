@@ -127,6 +127,12 @@ void OpenGLScene::setZRotation(int angle)
 void OpenGLScene::cleanup()
 {
     makeCurrent();
+    for(unsigned int i=0; i<m_simObjects.size(); i++)
+    {
+        m_simObjects[i]->RemoveFromDynamicWorld(m_dynamicWorld);
+        m_simObjects[i] = nullptr;
+    }
+    m_simObjects.clear();
     cleanPhysicsWorld();
     m_groundVBO.destroy();
     m_groundVAO.destroy();
@@ -140,14 +146,6 @@ void OpenGLScene::cleanPhysicsWorld()
 {
     // empty physics world
     m_dynamicWorld->removeRigidBody(m_groundRB);
-
-    // clean physics bodies
-//    for(auto&& simObj : m_simObjects)
-//    {
-//        delete simObj;
-//    }
-    m_simObjects.clear();
-
 
     // free physics memory
     delete m_groundRB;
