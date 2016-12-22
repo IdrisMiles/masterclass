@@ -25,10 +25,15 @@ public:
 
         float mass;
         float youngsModulus;
+        float yieldStrength;
 
         float internalSpringStiffness;
         float internalSpringDamping;
         float internalSpringBreakingImpulseThreshold;
+        glm::vec3 linearLowerLimit;
+        glm::vec3 linearUpperLimit;
+        glm::vec3 angularLowerLimit;
+        glm::vec3 angularUpperLimit;
 
         ConstraintTypes constraintType;
     }PhysBody;

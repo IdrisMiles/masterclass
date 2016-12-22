@@ -14,12 +14,13 @@ HEADERS  += $$PWD/include/*.h \
             $$PWD/include/Visualisation/*.h \
             $$PWD/include/UserInterface/*.h \
             $$PWD/include/SpherePacking/*.h \
+            $$PWD/include/Utils/*.h \
             $$PWD/include/Physics/*.h
 
 OBJECTS_DIR = ./obj
 MOC_DIR = ./moc
 UI_DIR += ./form
-FORMS    += ./ui/mainwindow.ui
+FORMS    += ./ui/*.ui
 OTHER_FILES += ./shader/*
 
 # include paths for boost and openvdb

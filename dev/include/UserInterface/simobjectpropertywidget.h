@@ -16,7 +16,6 @@
 #include <vector>
 #include <memory>
 
-
 class OpenGLScene;
 class SimObject;
 
@@ -50,6 +49,26 @@ public:
     QDoubleSpinBox *m_internalSpringDamping;
     QLabel *m_internalSpringBreakingImpulseThresholdLabel;
     QDoubleSpinBox *m_internalSpringBreakingImpulseThreshold;
+
+    QLabel *m_linearLowerLimitLabel;
+    QDoubleSpinBox *m_linearLowerLimitXThreshold;
+    QDoubleSpinBox *m_linearLowerLimitYThreshold;
+    QDoubleSpinBox *m_linearLowerLimitZThreshold;
+
+    QLabel *m_linearUpperLimitLabel;
+    QDoubleSpinBox *m_linearUpperLimitXThreshold;
+    QDoubleSpinBox *m_linearUpperLimitYThreshold;
+    QDoubleSpinBox *m_linearUpperLimitZThreshold;
+
+    QLabel *m_angularLowerLimitLabel;
+    QDoubleSpinBox *m_angularLowerLimitXThreshold;
+    QDoubleSpinBox *m_angularLowerLimitYThreshold;
+    QDoubleSpinBox *m_angularLowerLimitZThreshold;
+
+    QLabel *m_angularUpperLimitLabel;
+    QDoubleSpinBox *m_angularUpperLimitXThreshold;
+    QDoubleSpinBox *m_angularUpperLimitYThreshold;
+    QDoubleSpinBox *m_angularUpperLimitZThreshold;
 };
 
 
@@ -82,9 +101,12 @@ public:
     QDoubleSpinBox *m_mass;
     QLabel *m_youngsModulusLabel;
     QDoubleSpinBox *m_youngsModulus;
+    QLabel *m_yieldStrengthLabel;
+    QDoubleSpinBox *m_yieldStrength;
     QCheckBox *m_selfCollisions;
     FixedConstraintWidget *m_fixedConstraintWidget;
     Generic6DOFSpringConstraintWidget *m_generic6DOFSpringConstraintWidget;
+
     QPushButton *m_loadPhysBody;
     QComboBox *m_constraintSelection;
 

@@ -33,7 +33,6 @@ public:
 
 
 protected:
-    void LoadWithASSIMP(const std::string _meshFile);
     void CreateVAOs();
     void DeleteVAOs();
     void UpdateVAOs();

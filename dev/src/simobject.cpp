@@ -47,6 +47,11 @@ void SimObject::RemoveFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld)
     m_physBody.RemoveFromDynamicWorld(_dynamicWorld);
 }
 
+void SimObject::Update()
+{
+    m_physBody.Update();
+
+}
 
 void SimObject::Draw()
 {

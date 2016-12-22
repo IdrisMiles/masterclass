@@ -31,19 +31,22 @@ public:
     void GetSpheresMatrices(std::vector<glm::mat4> &_sphereMats) const;
     void Reset();
     void Cache(CachedSimObject &_cachSim);
+    void Update();
     void UpdatePhysicsProps();
     void SetID(const int &_id){m_id = _id;}
+
 
 private:
 
     void InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &meshVerts, const std::vector<glm::ivec3> &meshTris);
     void InitialiseInternalConstraints();
-    void AddConstraint(std::shared_ptr<btRigidBody> rigidA, std::shared_ptr<btRigidBody> rigidB);
+    std::shared_ptr<btTypedConstraint> CreateConstraint(btRigidBody &rigidA, btRigidBody &rigidB);
     void AddRigidBodiesToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
     void AddConstraintsToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
     void RemoveRigidBodiesFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
     void RemoveConstraintsFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
     void DeleteMesh();
+    void UpdatePlasticConstraints();
 
 
     unsigned int m_id;
@@ -55,7 +58,7 @@ private:
     std::vector<btDefaultMotionState*> m_motionStates;
     std::vector<btCollisionShape*> m_collisionShapes;
     std::vector<std::shared_ptr<btRigidBody>> m_rigidBodies;
-    std::vector<btTypedConstraint*> m_internalConstraints;
+    std::vector<std::shared_ptr<btTypedConstraint>> m_internalConstraints;
 
     Mesh m_mesh;
     std::vector<glm::vec4> m_spheres;

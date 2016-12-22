@@ -369,7 +369,11 @@ void OpenGLScene::updateSimulation()
 {
     if(m_runSim)
     {
-        m_dynamicWorld->stepSimulation(m_dt, 10);
+        m_dynamicWorld->stepSimulation(m_dt, 20);
+        for(auto &&so : m_simObjects)
+        {
+            so->Update();
+        }
         update();
 
         if(m_cache)

@@ -38,8 +38,28 @@ Generic6DOFSpringConstraintWidget::Generic6DOFSpringConstraintWidget(QWidget *pa
     m_internalSpringDamping->setMaximum(1000000);
     m_internalSpringBreakingImpulseThresholdLabel = new QLabel("Internal Spring Breaking Threshold", this);
     m_internalSpringBreakingImpulseThreshold = new QDoubleSpinBox(this);
-    m_internalSpringBreakingImpulseThreshold->setSingleStep(1);
+    m_internalSpringBreakingImpulseThreshold->setSingleStep(10);
     m_internalSpringBreakingImpulseThreshold->setMaximum(1000000);
+
+    m_linearLowerLimitLabel = new QLabel("Linear Lower Limit", this);
+    m_linearLowerLimitXThreshold = new QDoubleSpinBox(this);
+    m_linearLowerLimitYThreshold = new QDoubleSpinBox(this);
+    m_linearLowerLimitZThreshold = new QDoubleSpinBox(this);
+
+    m_linearUpperLimitLabel = new QLabel("Linear Upper Limit", this);
+    m_linearUpperLimitXThreshold = new QDoubleSpinBox(this);
+    m_linearUpperLimitYThreshold = new QDoubleSpinBox(this);
+    m_linearUpperLimitZThreshold = new QDoubleSpinBox(this);
+
+    m_angularLowerLimitLabel = new QLabel("Angular Lower Limit", this);
+    m_angularLowerLimitXThreshold = new QDoubleSpinBox(this);
+    m_angularLowerLimitYThreshold = new QDoubleSpinBox(this);
+    m_angularLowerLimitZThreshold = new QDoubleSpinBox(this);
+
+    m_angularUpperLimitLabel = new QLabel("Angular Upper Limit", this);
+    m_angularUpperLimitXThreshold = new QDoubleSpinBox(this);
+    m_angularUpperLimitYThreshold = new QDoubleSpinBox(this);
+    m_angularUpperLimitZThreshold = new QDoubleSpinBox(this);
 
 
     int row = 0;
@@ -51,6 +71,26 @@ Generic6DOFSpringConstraintWidget::Generic6DOFSpringConstraintWidget(QWidget *pa
     m_layout->addWidget(m_internalSpringDamping,row++,1,1,1);
     m_layout->addWidget(m_internalSpringBreakingImpulseThresholdLabel,row,0,1,1);
     m_layout->addWidget(m_internalSpringBreakingImpulseThreshold,row++,1,1,1);
+
+    m_layout->addWidget(m_linearUpperLimitLabel,row,0,1,1);
+    m_layout->addWidget(m_linearUpperLimitXThreshold,row,1,1,1);
+    m_layout->addWidget(m_linearUpperLimitYThreshold,row,2,1,1);
+    m_layout->addWidget(m_linearUpperLimitZThreshold,row++,3,1,1);
+
+    m_layout->addWidget(m_linearLowerLimitLabel,row,0,1,1);
+    m_layout->addWidget(m_linearLowerLimitXThreshold,row,1,1,1);
+    m_layout->addWidget(m_linearLowerLimitYThreshold,row,2,1,1);
+    m_layout->addWidget(m_linearLowerLimitZThreshold,row++,3,1,1);
+
+    m_layout->addWidget(m_angularUpperLimitLabel,row,0,1,1);
+    m_layout->addWidget(m_angularUpperLimitXThreshold,row,1,1,1);
+    m_layout->addWidget(m_angularUpperLimitYThreshold,row,2,1,1);
+    m_layout->addWidget(m_angularUpperLimitZThreshold,row++,3,1,1);
+
+    m_layout->addWidget(m_angularLowerLimitLabel,row,0,1,1);
+    m_layout->addWidget(m_angularLowerLimitXThreshold,row,1,1,1);
+    m_layout->addWidget(m_angularLowerLimitYThreshold,row,2,1,1);
+    m_layout->addWidget(m_angularLowerLimitZThreshold,row++,3,1,1);
 
     setLayout(m_layout);
 }
@@ -99,6 +139,8 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_mass = new QDoubleSpinBox(m_physProps);
     m_youngsModulusLabel = new QLabel("Youngs Modulus", m_physProps);
     m_youngsModulus = new QDoubleSpinBox(m_physProps);
+    m_yieldStrengthLabel = new QLabel("Yield Strength", m_physProps);
+    m_yieldStrength = new QDoubleSpinBox(m_physProps);
     m_selfCollisions = new QCheckBox("Self Collision", m_physProps);
     m_loadPhysBody = new QPushButton("Load", m_physProps);
 
@@ -108,6 +150,7 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_constraintSelection = new QComboBox(m_physProps);
     m_constraintSelection->addItem("Fixed");
     m_constraintSelection->addItem("Generic6DOFSpring");
+
 
 
     //-----------------------------------------------------------------------------------------
@@ -138,6 +181,8 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_physPropsLayout->addWidget(m_mass,row++,1,1,1);
     m_physPropsLayout->addWidget(m_youngsModulusLabel,row,0,1,1);
     m_physPropsLayout->addWidget(m_youngsModulus,row++,1,1,1);
+    m_physPropsLayout->addWidget(m_yieldStrengthLabel,row,0,1,1);
+    m_physPropsLayout->addWidget(m_yieldStrength,row++,1,1,1);
     m_physPropsLayout->addWidget(m_selfCollisions, row++, 0, 1, 1);
     m_physPropsLayout->addWidget(m_loadPhysBody, row++, 0, 1, 1);
     m_physPropsLayout->addWidget(m_constraintSelection, row++, 0, 1, 1);
@@ -173,6 +218,7 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_physicsProps->PhysBody.internalSpringDamping = 1.0f;
     m_physicsProps->PhysBody.internalSpringBreakingImpulseThreshold = 1000000.0f;
     m_physicsProps->PhysBody.selfCollisions = false;
+    m_physicsProps->PhysBody.yieldStrength = 1.0f;
 
     // initalise widgets to property values
     m_drawMesh->setChecked(m_physicsProps->RenderMesh.drawMesh);
@@ -183,7 +229,27 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     m_maxSphereRad->setValue(m_physicsProps->PhysBody.maxSphereRad);
     m_overlapSpheres->setChecked(m_physicsProps->PhysBody.overlapSpheres);
     m_selfCollisions->setChecked(m_physicsProps->PhysBody.selfCollisions);
+    m_yieldStrength->setValue(m_physicsProps->PhysBody.yieldStrength);
     m_fixedConstraintWidget->m_internalSpringBreakingImpulseThreshold->setValue(m_physicsProps->PhysBody.internalSpringBreakingImpulseThreshold);
+    m_generic6DOFSpringConstraintWidget->m_internalSpringBreakingImpulseThreshold->setValue(m_physicsProps->PhysBody.internalSpringBreakingImpulseThreshold);
+
+    m_fixedConstraintWidget->hide();
+    m_generic6DOFSpringConstraintWidget->hide();
+    if(m_constraintSelection->currentText().toStdString() == "Fixed")
+    {
+        m_physicsProps->PhysBody.constraintType = ConstraintTypes::Fixed;
+        m_fixedConstraintWidget->show();
+    }
+    else if(m_constraintSelection->currentText().toStdString() == "Generic6DOFSpring")
+    {
+        m_physicsProps->PhysBody.constraintType = ConstraintTypes::Generic6DOFSpring;
+        m_generic6DOFSpringConstraintWidget->show();
+    }
+    else
+    {
+        m_physicsProps->PhysBody.constraintType = ConstraintTypes::Fixed;
+        m_fixedConstraintWidget->show();
+    }
 
     //-----------------------------------------------------------------------------------------
     // Connect widget singal and slots
@@ -202,12 +268,26 @@ SimObjectPropertiesWidget::SimObjectPropertiesWidget(QWidget *parent):QGroupBox(
     connect(m_maxSphereRad, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_overlapSpheres, SIGNAL(clicked(bool)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_youngsModulus, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_yieldStrength, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
 
     connect(m_fixedConstraintWidget->m_internalSpringBreakingImpulseThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
 
     connect(m_generic6DOFSpringConstraintWidget->m_internalSpringStiffness, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_generic6DOFSpringConstraintWidget->m_internalSpringDamping, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_generic6DOFSpringConstraintWidget->m_internalSpringBreakingImpulseThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_linearLowerLimitXThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_linearLowerLimitYThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_linearLowerLimitZThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_linearUpperLimitXThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_linearUpperLimitYThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_linearUpperLimitZThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_angularLowerLimitXThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_angularLowerLimitYThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_angularLowerLimitZThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_angularUpperLimitXThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_angularUpperLimitYThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+    connect(m_generic6DOFSpringConstraintWidget->m_angularUpperLimitZThreshold, SIGNAL(valueChanged(double)), this, SLOT(UpdatePhysicsProperties()));
+
 
     connect(m_constraintSelection, SIGNAL(currentIndexChanged(QString)), this, SLOT(UpdatePhysicsProperties()));
     connect(m_selfCollisions, SIGNAL(clicked(bool)), this, SLOT(UpdatePhysicsProperties()));
@@ -233,16 +313,12 @@ SimObjectPropertiesWidget::~SimObjectPropertiesWidget()
 
 void SimObjectPropertiesWidget::ConnectWithOpenGLScene(OpenGLScene *_glScene)
 {
-    //connect(this, SIGNAL(PhysicsBodyPropertiesUpdated()), _glScene, SLOT(update()));
-
     connect(this, SIGNAL(RenderingPropertiesUpdated()), _glScene, SLOT(update()));
-    //connect(this, SIGNAL(PhysicsPropertiesUpdated()), _glScene, SLOT(update()));
 }
 
 void SimObjectPropertiesWidget::ConnectWithSimObject(std::shared_ptr<SimObject> _simObject)
 {
     m_simObject = _simObject;
-    //connect(this, SIGNAL(PhysicsPropertiesUpdated()), _glScene, SLOT(update()));
 }
 
 void SimObjectPropertiesWidget::UpdateRenderingProperties()
@@ -264,6 +340,8 @@ void SimObjectPropertiesWidget::UpdatePhysicsProperties()
     m_physicsProps->PhysBody.minSphereRad = m_minSphereRad->value();
     m_physicsProps->PhysBody.maxSphereRad = m_maxSphereRad->value();
     m_physicsProps->PhysBody.overlapSpheres = m_overlapSpheres->isChecked();
+    m_physicsProps->PhysBody.selfCollisions = m_selfCollisions->isChecked();
+    m_physicsProps->PhysBody.yieldStrength = m_yieldStrength->value();
 
 
     m_fixedConstraintWidget->hide();
@@ -276,6 +354,9 @@ void SimObjectPropertiesWidget::UpdatePhysicsProperties()
     else if(m_constraintSelection->currentText().toStdString() == "Generic6DOFSpring")
     {
         m_physicsProps->PhysBody.constraintType = ConstraintTypes::Generic6DOFSpring;
+        m_physicsProps->PhysBody.linearLowerLimit.x = m_generic6DOFSpringConstraintWidget->m_linearLowerLimitXThreshold->value();
+        m_physicsProps->PhysBody.linearLowerLimit.y = m_generic6DOFSpringConstraintWidget->m_linearLowerLimitYThreshold->value();
+        m_physicsProps->PhysBody.linearLowerLimit.z = m_generic6DOFSpringConstraintWidget->m_linearLowerLimitZThreshold->value();
         m_generic6DOFSpringConstraintWidget->show();
     }
     else
