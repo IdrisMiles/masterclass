@@ -405,7 +405,6 @@ void PhysicsBody::UpdatePlasticConstraints()
 
             // remove old constraint
             m_dynamicWorld->removeConstraint(m_internalConstraints[i].get());
-            //m_internalConstraints[i] = nullptr;
 
             // add updated constraint
             m_internalConstraints.at(i) = CreateConstraint(*rbA, *rbB);

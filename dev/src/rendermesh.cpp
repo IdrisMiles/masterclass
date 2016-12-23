@@ -1,6 +1,6 @@
 #include "include/Visualisation/rendermesh.h"
 #include <iostream>
-
+#include <algorithm>
 
 RenderMesh::RenderMesh(QOpenGLShaderProgram *_shaderProg)
 {
@@ -49,7 +49,7 @@ void RenderMesh::LoadMesh(const Mesh _mesh, QOpenGLShaderProgram *_shaderProg, s
     m_meshVerts = _mesh.verts;
     m_meshNorms = _mesh.norms;
     m_meshTris = _mesh.tris;
-
+    m_skinnedMeshVerts = m_meshVerts;
 
     //----------------------------------------------------------------------
     // Iitialise GL VAO and buffers
@@ -74,7 +74,7 @@ void RenderMesh::DrawMesh()
     m_meshVAO.bind();
 
     m_meshVBO.bind();
-    m_meshVBO.allocate(&m_meshVerts[0], m_meshVerts.size() * sizeof(glm::vec3));
+    m_meshVBO.allocate(&m_skinnedMeshVerts[0], m_skinnedMeshVerts.size() * sizeof(glm::vec3));
     m_meshVBO.release();
 
     glPolygonMode(GL_FRONT_AND_BACK, m_wireframe?GL_LINE:GL_FILL);
@@ -85,33 +85,54 @@ void RenderMesh::DrawMesh()
 
 void RenderMesh::InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres)
 {
+    // Get control points
+    for(unsigned int i=0; i<_spheres.size(); i++)
+    {
+        m_controlPoints.push_back(glm::vec3(_spheres[i].x, _spheres[i].y, _spheres[i].z));
+    }
+
+
+    // initialise vert control point weights
     m_skinWeights.resize(m_meshVerts.size());
     for(unsigned int i=0; i<m_meshVerts.size(); i++)
     {
-        float totalWeight = 0.0f;
+        int maxNumNeighs = 4;
+        std::vector<std::pair<int, float>> neighs(maxNumNeighs, std::make_pair(-1, FLT_MAX));
+        float totalDist = 0.0f;
+        float newtotalWeight = 0.0f;
 
-        m_skinWeights[i].resize(_spheres.size());
-        for(unsigned int j=0; j<_spheres.size(); j++)
+
+        // Find closest neighbours
+        m_skinWeights[i].resize(m_controlPoints.size());
+        for(unsigned int j=0; j<m_controlPoints.size(); j++)
         {
-            float dist = glm::distance(m_meshVerts[i], glm::vec3(_spheres[j].x, _spheres[j].y, _spheres[j].z));
-            if ( dist < 1.0f )
+            float dist = glm::distance(m_meshVerts[i], m_controlPoints[j]);
+            if(dist < neighs.back().second)
             {
-                m_skinWeights[i][j] = dist;
-                totalWeight += dist;
+                neighs.pop_back();
+                neighs.push_back(std::make_pair(j, dist));
+                std::sort(neighs.begin(), neighs.end(), [](std::pair<int, float> a, std::pair<int, float> b){return a.second < b.second;});
             }
-            else
-            {
-                m_skinWeights[i][j] = -1.0f;
-            }
+
+            m_skinWeights[i][j] = -1.0f;
         }
 
-        for(unsigned int j=0; j<_spheres.size(); j++)
+        // Get total distance
+        for(unsigned int k=0; k<neighs.size(); k++)
         {
-            if ( m_skinWeights[i][j] > 0.0f )
-            {
-                m_skinWeights[i][j] /= totalWeight;
-            }
+            totalDist += neighs[k].second;
         }
+
+        // normalize the weights for this vert
+        for(unsigned int k=0; k<neighs.size(); k++)
+        {
+            int controlPointId = neighs[k].first;
+            float dist = neighs[k].second;
+
+            m_skinWeights[i][controlPointId] = (1.0f - (dist / totalDist))/(maxNumNeighs-1);
+            newtotalWeight += m_skinWeights[i][controlPointId];
+        }
+
     }
 
     m_skinWeightLoaded = true;
@@ -121,24 +142,43 @@ void RenderMesh::Skin(const std::vector<glm::vec4> &_spheres)
 {
     if(!m_skinWeightLoaded)
     {
+        printf("skin weights have not been loaded - abort skinning\n");
+        return;
+    }
+
+    if(_spheres.size() != m_controlPoints.size())
+    {
+        printf("Different number of control points now - abort skinning\n");
+        return;
+    }
+
+    if(m_skinnedMeshVerts.size() != m_meshVerts.size())
+    {
+        printf("Different number of mesh verts now - abort skinning\n");
         return;
     }
 
 
-    for(unsigned int i=0; i<m_meshVerts.size(); i++)
+    // Get our delta displacement
+    std::vector<glm::vec3> deltaControlPoints;
+    for(unsigned int i=0; i<_spheres.size(); i++)
     {
-        glm::vec3 newPos;
+        deltaControlPoints.push_back(glm::vec3(_spheres[i].x, _spheres[i].y, _spheres[i].z) - m_controlPoints[i]);
+    }
 
-        for(unsigned int j=0; j<_spheres.size(); j++)
+    for(unsigned int i=0; i<m_skinnedMeshVerts.size(); i++)
+    {
+        glm::vec3 delta = glm::vec3(0.0f, 0.0f, 0.0f);
+
+        for(unsigned int j=0; j<deltaControlPoints.size(); j++)
         {
             if ( m_skinWeights[i][j] > 0.0f )
             {
-                glm::vec3 controlPoint(_spheres[j].x, _spheres[j].y, _spheres[j].z);
-                newPos += (m_skinWeights[i][j] * controlPoint);
+                delta += m_skinWeights[i][j] * deltaControlPoints[j];
             }
         }
 
-        m_meshVerts[i] = newPos;
+        m_skinnedMeshVerts[i] = m_meshVerts[i] + delta;
     }
 }
 

@@ -34,7 +34,7 @@ void SimObject::LoadMesh(const std::string _meshFile)
 
     std::vector<glm::vec4> spheres;
     m_physBody.GetSpheres(spheres);
-    //m_mesh.InitialiseSkinWeights(spheres);
+    m_mesh.InitialiseSkinWeights(spheres);
 }
 
 void SimObject::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions)
@@ -56,8 +56,15 @@ void SimObject::Update()
 void SimObject::Draw()
 {
     // Draw the mesh
+    std::vector<glm::mat4> sphereMats;
+    m_physBody.GetSpheresMatrices(sphereMats);
+
     std::vector<glm::vec4> spheres;
-    m_physBody.GetSpheres(spheres);
+    for(auto sm : sphereMats)
+    {
+        spheres.push_back( sm * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) );
+    }
+    //m_physBody.GetSpheres(spheres);
     m_mesh.Skin(spheres);
     m_mesh.DrawMesh();
 

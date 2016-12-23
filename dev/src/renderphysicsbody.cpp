@@ -76,6 +76,7 @@ void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres)
         m_sphereRad.push_back(r);
         m_sphereModelMats.push_back(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)), glm::vec3(r, r, r)));
     }
+    printf("sphere verts: %u\n", m_meshVerts.size());
 }
 
 void RenderPhysicsBody::DrawMesh()
