@@ -341,9 +341,20 @@ void PhysicsBody::DeleteMesh()
     m_spheres.clear();
 }
 
-void PhysicsBody::GetSpheres(std::vector<glm::vec4> &_spheres) const
+void PhysicsBody::GetOrigSpheres(std::vector<glm::vec4> &_spheres) const
 {
     _spheres = m_spheres;
+}
+
+void PhysicsBody::GetUpdatedSpheres(std::vector<glm::vec4> &_spheres) const
+{
+    std::vector<glm::mat4> sphereMats;
+    GetSpheresMatrices(sphereMats);
+
+    for(auto sm : sphereMats)
+    {
+        _spheres.push_back( sm * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) );
+    }
 }
 
 void PhysicsBody::GetSpheresMatrices(std::vector<glm::mat4> &_sphereMats) const

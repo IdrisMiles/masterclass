@@ -46,7 +46,7 @@ void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProg
     //----------------------------------------------------------------------
     // Initialise mesh
     std::vector<glm::vec4> spheres;
-    _physBody.GetSpheres(spheres);
+    _physBody.GetOrigSpheres(spheres);
     LoadSpheres(spheres);
 
 

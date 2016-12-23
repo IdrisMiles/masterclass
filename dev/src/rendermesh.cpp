@@ -85,6 +85,9 @@ void RenderMesh::DrawMesh()
 
 void RenderMesh::InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres)
 {
+    m_controlPoints.clear();
+    m_skinWeights.clear();
+
     // Get control points
     for(unsigned int i=0; i<_spheres.size(); i++)
     {
@@ -93,44 +96,38 @@ void RenderMesh::InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres)
 
 
     // initialise vert control point weights
+    int maxNumNeighs = 4;
     m_skinWeights.resize(m_meshVerts.size());
     for(unsigned int i=0; i<m_meshVerts.size(); i++)
     {
-        int maxNumNeighs = 4;
-        std::vector<std::pair<int, float>> neighs(maxNumNeighs, std::make_pair(-1, FLT_MAX));
+        m_skinWeights[i].resize(maxNumNeighs, std::make_pair(-1, FLT_MAX));
         float totalDist = 0.0f;
         float newtotalWeight = 0.0f;
 
 
         // Find closest neighbours
-        m_skinWeights[i].resize(m_controlPoints.size());
         for(unsigned int j=0; j<m_controlPoints.size(); j++)
         {
             float dist = glm::distance(m_meshVerts[i], m_controlPoints[j]);
-            if(dist < neighs.back().second)
+            if(dist < m_skinWeights[i].back().second)
             {
-                neighs.pop_back();
-                neighs.push_back(std::make_pair(j, dist));
-                std::sort(neighs.begin(), neighs.end(), [](std::pair<int, float> a, std::pair<int, float> b){return a.second < b.second;});
+                m_skinWeights[i].pop_back();
+                m_skinWeights[i].push_back(std::make_pair(j, dist));
+                std::sort(m_skinWeights[i].begin(), m_skinWeights[i].end(), [](std::pair<int, float> a, std::pair<int, float> b){return a.second < b.second;});
             }
-
-            m_skinWeights[i][j] = -1.0f;
         }
 
         // Get total distance
-        for(unsigned int k=0; k<neighs.size(); k++)
+        for(unsigned int k=0; k<m_skinWeights[i].size(); k++)
         {
-            totalDist += neighs[k].second;
+            totalDist += m_skinWeights[i][k].second;
         }
 
         // normalize the weights for this vert
-        for(unsigned int k=0; k<neighs.size(); k++)
+        for(unsigned int k=0; k<m_skinWeights[i].size(); k++)
         {
-            int controlPointId = neighs[k].first;
-            float dist = neighs[k].second;
-
-            m_skinWeights[i][controlPointId] = (1.0f - (dist / totalDist))/(maxNumNeighs-1);
-            newtotalWeight += m_skinWeights[i][controlPointId];
+            m_skinWeights[i][k].second = (1.0f - (m_skinWeights[i][k].second / totalDist))/(maxNumNeighs-1);
+            newtotalWeight += m_skinWeights[i][k].second;
         }
 
     }
@@ -170,12 +167,9 @@ void RenderMesh::Skin(const std::vector<glm::vec4> &_spheres)
     {
         glm::vec3 delta = glm::vec3(0.0f, 0.0f, 0.0f);
 
-        for(unsigned int j=0; j<deltaControlPoints.size(); j++)
+        for(unsigned int j=0;j<m_skinWeights[i].size(); j++)
         {
-            if ( m_skinWeights[i][j] > 0.0f )
-            {
-                delta += m_skinWeights[i][j] * deltaControlPoints[j];
-            }
+            delta += m_skinWeights[i][j].second * deltaControlPoints[m_skinWeights[i][j].first];
         }
 
         m_skinnedMeshVerts[i] = m_meshVerts[i] + delta;

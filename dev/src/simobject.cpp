@@ -33,7 +33,7 @@ void SimObject::LoadMesh(const std::string _meshFile)
 
 
     std::vector<glm::vec4> spheres;
-    m_physBody.GetSpheres(spheres);
+    m_physBody.GetOrigSpheres(spheres);
     m_mesh.InitialiseSkinWeights(spheres);
 }
 
@@ -60,11 +60,7 @@ void SimObject::Draw()
     m_physBody.GetSpheresMatrices(sphereMats);
 
     std::vector<glm::vec4> spheres;
-    for(auto sm : sphereMats)
-    {
-        spheres.push_back( sm * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) );
-    }
-    //m_physBody.GetSpheres(spheres);
+    m_physBody.GetUpdatedSpheres(spheres);
     m_mesh.Skin(spheres);
     m_mesh.DrawMesh();
 
@@ -90,6 +86,10 @@ void SimObject::UpdatePhysicsProps()
 {
     m_physBody.UpdatePhysicsProps();
     m_physMesh.UpdatePhysicsProps(m_physBody);
+
+    std::vector<glm::vec4> spheres;
+    m_physBody.GetUpdatedSpheres(spheres);
+    m_mesh.InitialiseSkinWeights(spheres);
 }
 
 void SimObject::UpdateRenderProps()

@@ -64,7 +64,7 @@ protected:
     std::vector<glm::ivec3> m_meshTris;
 
     std::vector<glm::vec3> m_skinnedMeshVerts;
-    std::vector<std::vector<float>> m_skinWeights;
+    std::vector<std::vector<std::pair<unsigned int, float>>> m_skinWeights;
     std::vector<glm::vec3> m_controlPoints;
 };
 

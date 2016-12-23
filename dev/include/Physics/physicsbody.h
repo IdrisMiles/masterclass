@@ -27,7 +27,8 @@ public:
     void LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties> _props = nullptr);
     void AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions = false);
     void RemoveFromDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld);
-    void GetSpheres(std::vector<glm::vec4> &_spheres) const;
+    void GetOrigSpheres(std::vector<glm::vec4> &_spheres) const;
+    void GetUpdatedSpheres(std::vector<glm::vec4> &_spheres) const;
     void GetSpheresMatrices(std::vector<glm::mat4> &_sphereMats) const;
     void Reset();
     void Cache(CachedSimObject &_cachSim);
