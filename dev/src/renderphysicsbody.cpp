@@ -1,13 +1,16 @@
 #include "include/Visualisation/renderphysicsbody.h"
 #include <glm/gtx/transform.hpp>
+#include "Visualisation/openglscene.h"
 
-
-RenderPhysicsBody::RenderPhysicsBody(QOpenGLShaderProgram *_shaderProg) : RenderMesh(_shaderProg)
+RenderPhysicsBody::RenderPhysicsBody() : RenderMesh()
 {
-    if(_shaderProg)
-    {
-        m_shaderProg = _shaderProg;
-    }
+    m_meshLoaded = false;
+    m_vaoLoaded = false;
+}
+
+
+RenderPhysicsBody::RenderPhysicsBody(const RenderPhysicsBody &_copy)
+{
     m_meshLoaded = false;
     m_vaoLoaded = false;
 }
@@ -20,21 +23,17 @@ RenderPhysicsBody::~RenderPhysicsBody()
     m_meshIBO.destroy();
     m_meshModelMatInstanceBO.destroy();
 
+    delete m_shaderProg;
     m_shaderProg = 0;
     m_physicsBodyProperties = nullptr;
 }
 
-void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
+void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
 {
     m_meshLoaded = true;
     if(_physicsBodyProperties != nullptr)
     {
         m_physicsBodyProperties = _physicsBodyProperties;
-    }
-
-    if(_shaderProg != 0)
-    {
-        m_shaderProg = _shaderProg;
     }
 
     m_modelMat = glm::mat4(1.0f);
@@ -54,6 +53,7 @@ void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProg
     // Iitialise GL VAO and buffers
     if(!m_vaoLoaded)
     {
+        CreateShader();
         CreateVAOs();
         UpdateVAOs();
     }
@@ -65,6 +65,9 @@ void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProg
 
 void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres)
 {
+    m_sphereRad.clear();
+    m_sphereModelMats.clear();
+    m_meshVerts.clear();
     AppendSphereVerts(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
     for(auto sphere : _spheres)
     {
@@ -76,12 +79,15 @@ void RenderPhysicsBody::LoadSpheres(const std::vector<glm::vec4> &_spheres)
         m_sphereRad.push_back(r);
         m_sphereModelMats.push_back(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)), glm::vec3(r, r, r)));
     }
-    printf("sphere verts: %u\n", m_meshVerts.size());
 }
 
 void RenderPhysicsBody::DrawMesh()
 {
     if(!m_drawMesh || !m_meshLoaded){return;}
+    m_shaderProg->bind();
+
+    glUniformMatrix4fv(m_projMatrixLoc, 1, false, &OpenGLScene::getProjMat()[0][0]);
+    glUniformMatrix4fv(m_viewMatrixLoc, 1, false, &(OpenGLScene::getViewMat()*OpenGLScene::getModelMat())[0][0]);
 
     glUniform3fv(m_colourLoc, 1, &m_colour[0]);
 
@@ -93,6 +99,7 @@ void RenderPhysicsBody::DrawMesh()
 
     glDrawElementsInstanced(GL_TRIANGLES, m_meshTris.size()*3, GL_UNSIGNED_INT, &m_meshTris[0], m_sphereModelMats.size());
     m_meshVAO.release();
+    m_shaderProg->release();
 
 }
 

@@ -38,6 +38,11 @@ public:
     std::shared_ptr<SimObject> GetPhysicsBody(const unsigned &_i = 0) {return  (_i<m_simObjects.size())?m_simObjects[_i]:NULL;}
     int NumPhysicsBodies()const {return m_simObjects.size();}
 
+    static glm::mat4 getProjMat(){return m_projMat;}
+    static glm::mat4 getViewMat(){return m_viewMat;}
+    static glm::mat4 getModelMat(){return m_modelMat;}
+    static glm::vec3 getLightPos(){return m_lightPos;}
+
 public slots:
     void ToggleSim();
     void setXRotation(int angle);
@@ -79,10 +84,10 @@ private:
     int m_modelMatrixLoc;
     int m_lightPosLoc;
 
-    glm::mat4 m_projMat;
-    glm::mat4 m_viewMat;
-    glm::mat4 m_modelMat;
-    glm::vec3 m_lightPos;
+    static glm::mat4 m_projMat;
+    static glm::mat4 m_viewMat;
+    static glm::mat4 m_modelMat;
+    static glm::vec3 m_lightPos;
     QOpenGLShaderProgram *m_shaderProg;
 
     // Ground plane stuff

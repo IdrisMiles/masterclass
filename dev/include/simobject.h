@@ -1,6 +1,7 @@
 #ifndef SIMOBJECT_H
 #define SIMOBJECT_H
 
+#include <vector>
 #include "include/Physics//physicsbody.h"
 #include "include/UserInterface/simobjectproperties.h"
 #include "include/Physics/physicsconstraint.h"
@@ -12,7 +13,7 @@
 class SimObject
 {
 public:
-    SimObject(const unsigned int _id = 0, QOpenGLShaderProgram *_shaderProg = nullptr, std::shared_ptr<SimObjectProperties> _properties = nullptr);
+    SimObject(unsigned int _id = 0, std::shared_ptr<SimObjectProperties> _properties = nullptr);
     ~SimObject();
 
     void LoadMesh(const std::string _meshFile);
@@ -27,16 +28,17 @@ public:
 
 
 private:
-    RenderMesh m_mesh;
-    std::vector<RenderMesh*> m_meshes;
-    RenderPhysicsBody m_physMesh;
-    PhysicsBody m_physBody;
+//    RenderMesh m_mesh;
+    std::vector<RenderMesh> m_mesh;
+//    RenderPhysicsBody m_physMesh;
+    std::vector<RenderPhysicsBody> m_physMesh;
+//    PhysicsBody m_physBody;
+    std::vector<PhysicsBody> m_physBody;
     CachedSimObject m_cachedSim;
     std::shared_ptr<SimObjectProperties> m_physicsBodyProperties;
 
 
     unsigned int m_id;
-    QOpenGLShaderProgram* m_shaderProg;
 
 
 };

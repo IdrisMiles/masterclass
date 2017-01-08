@@ -15,7 +15,7 @@ class MeshLoader
 public:
     MeshLoader();
 
-    static Mesh LoadMesh(const std::string _meshFile);
+    static std::vector<Mesh> LoadMesh(const std::string _meshFile);
 };
 
 #endif // MESHLOADER_H

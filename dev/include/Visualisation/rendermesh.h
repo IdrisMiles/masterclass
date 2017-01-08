@@ -9,6 +9,7 @@
 
 #include "include/UserInterface/simobjectproperties.h"
 #include "include/Visualisation/mesh.h"
+#include "include/Physics/physicsbody.h"
 
 #include <memory>
 
@@ -16,23 +17,25 @@
 class RenderMesh
 {
 public:
-    RenderMesh(QOpenGLShaderProgram *_shaderProg = 0);
+    RenderMesh();
+    RenderMesh(const RenderMesh &_copy);
     virtual ~RenderMesh();
 
-    virtual void LoadMesh(const Mesh _mesh, QOpenGLShaderProgram *_shaderProg = 0, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
+    virtual void LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
     virtual void DrawMesh();
 
     void InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres);
+    void InitialiseSkinWeights(const PhysicsBody &_physBody);
     void Skin(const std::vector<glm::vec4> &_spheres);
 
     // Setter
-    void SetShaderProg(QOpenGLShaderProgram *_shaderProg);
     void SetWireframe(const bool &_wireframe);
     void SetDrawMesh(const bool &_drawMesh);
     void SetColour(const glm::vec3 &_colour);
 
 
 protected:
+    void CreateShader();
     void CreateVAOs();
     void DeleteVAOs();
     void UpdateVAOs();
@@ -49,7 +52,11 @@ protected:
     glm::mat4 m_modelMat;
     glm::vec3 m_colour;
 
+    // Scene shader stuff
+    int m_projMatrixLoc;
+    int m_viewMatrixLoc;
     int m_modelMatrixLoc;
+    int m_lightPosLoc;
     int m_colourLoc;
 
     QOpenGLShaderProgram *m_shaderProg;

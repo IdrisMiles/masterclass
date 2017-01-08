@@ -7,6 +7,10 @@
 #include <QFileDialog>
 #include <QKeyEvent>
 
+glm::mat4 OpenGLScene::m_projMat;
+glm::mat4 OpenGLScene::m_viewMat;
+glm::mat4 OpenGLScene::m_modelMat;
+glm::vec3 OpenGLScene::m_lightPos;
 
 OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     m_xRot(0),
@@ -166,7 +170,7 @@ void OpenGLScene::cleanPhysicsWorld()
 void OpenGLScene::loadSimObject(const std::string &_file, std::shared_ptr<SimObjectProperties> _properties)
 {
     makeCurrent();
-    m_simObjects.push_back(std::shared_ptr<SimObject>(new SimObject(m_simObjects.size(), m_shaderProg, _properties)));
+    m_simObjects.push_back(std::shared_ptr<SimObject>(new SimObject(m_simObjects.size(), _properties)));
     m_simObjects.back()->LoadMesh(_file);
     m_simObjects.back()->AddToDynamicWorld(m_dynamicWorld);
     doneCurrent();
@@ -354,6 +358,9 @@ void OpenGLScene::paintGL()
     // Draw code
     drawGroundPlane();
 
+    m_shaderProg->release();
+
+
     for(auto&& simObj : m_simObjects)
     {
         simObj->Draw();
@@ -361,7 +368,6 @@ void OpenGLScene::paintGL()
     //---------------------------------------------------------------------------------------
 
 
-    m_shaderProg->release();
 
 }
 

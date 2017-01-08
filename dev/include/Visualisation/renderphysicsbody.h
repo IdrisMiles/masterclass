@@ -7,10 +7,11 @@
 class RenderPhysicsBody : public RenderMesh
 {
 public:
-    RenderPhysicsBody(QOpenGLShaderProgram *_shaderProg = 0);
+    RenderPhysicsBody();
+    RenderPhysicsBody(const RenderPhysicsBody &_copy);
     virtual ~RenderPhysicsBody();
 
-    virtual void LoadMesh(const PhysicsBody &_physBody, QOpenGLShaderProgram *_shaderProg = 0, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
+    virtual void LoadMesh(const PhysicsBody &_physBody, std::shared_ptr<SimObjectProperties> _physicsBodyProperties = nullptr);
     virtual void DrawMesh() override;
     void UpdateMesh(const PhysicsBody &_physBody);
     void UpdatePhysicsProps(const PhysicsBody &_physBody);

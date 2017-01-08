@@ -1,13 +1,18 @@
 #include "include/Visualisation/rendermesh.h"
 #include <iostream>
 #include <algorithm>
+#include "Visualisation/openglscene.h"
 
-RenderMesh::RenderMesh(QOpenGLShaderProgram *_shaderProg)
+RenderMesh::RenderMesh()
 {
-    if(_shaderProg)
-    {
-        m_shaderProg = _shaderProg;
-    }
+    m_meshLoaded = false;
+    m_vaoLoaded = false;
+    m_skinWeightLoaded = false;
+}
+
+
+RenderMesh::RenderMesh(const RenderMesh &_copy)
+{
     m_meshLoaded = false;
     m_vaoLoaded = false;
     m_skinWeightLoaded = false;
@@ -21,22 +26,18 @@ RenderMesh::~RenderMesh()
     m_meshIBO.destroy();
     m_meshModelMatInstanceBO.destroy();
 
+    delete m_shaderProg;
     m_shaderProg = 0;
     m_physicsBodyProperties = nullptr;
 }
 
 
-void RenderMesh::LoadMesh(const Mesh _mesh, QOpenGLShaderProgram *_shaderProg, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
+void RenderMesh::LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties> _physicsBodyProperties)
 {
     m_meshLoaded = true;
     if(m_physicsBodyProperties)
     {
         m_physicsBodyProperties = _physicsBodyProperties;
-    }
-
-    if(_shaderProg != 0)
-    {
-        m_shaderProg = _shaderProg;
     }
 
     m_modelMat = glm::mat4(1.0f);
@@ -55,6 +56,7 @@ void RenderMesh::LoadMesh(const Mesh _mesh, QOpenGLShaderProgram *_shaderProg, s
     // Iitialise GL VAO and buffers
     if(!m_vaoLoaded)
     {
+        CreateShader();
         CreateVAOs();
         UpdateVAOs();
     }
@@ -69,6 +71,11 @@ void RenderMesh::DrawMesh()
 {
     if(!m_drawMesh || !m_meshLoaded){return;}
 
+    m_shaderProg->bind();
+
+    glUniformMatrix4fv(m_projMatrixLoc, 1, false, &OpenGLScene::getProjMat()[0][0]);
+    glUniformMatrix4fv(m_viewMatrixLoc, 1, false, &(OpenGLScene::getViewMat()*OpenGLScene::getModelMat())[0][0]);
+
     glUniform3fv(m_colourLoc, 1, &m_colour[0]);
 
     m_meshVAO.bind();
@@ -81,6 +88,8 @@ void RenderMesh::DrawMesh()
     glDrawElements(GL_TRIANGLES, m_meshTris.size()*3, GL_UNSIGNED_INT, &m_meshTris[0]);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     m_meshVAO.release();
+
+    m_shaderProg->release();
 }
 
 void RenderMesh::InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres)
@@ -135,6 +144,16 @@ void RenderMesh::InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres)
     m_skinWeightLoaded = true;
 }
 
+void RenderMesh::InitialiseSkinWeights(const PhysicsBody &_physBody)
+{
+    std::vector<glm::vec4> spheres;
+    _physBody.GetOrigSpheres(spheres);
+    if(spheres.size() > 0)
+    {
+        InitialiseSkinWeights(spheres);
+    }
+}
+
 void RenderMesh::Skin(const std::vector<glm::vec4> &_spheres)
 {
     if(!m_skinWeightLoaded)
@@ -176,16 +195,6 @@ void RenderMesh::Skin(const std::vector<glm::vec4> &_spheres)
     }
 }
 
-
-void RenderMesh::SetShaderProg(QOpenGLShaderProgram *_shaderProg)
-{
-
-    if(_shaderProg)
-    {
-        m_shaderProg = _shaderProg;
-    }
-}
-
 void RenderMesh::SetWireframe(const bool &_wireframe)
 {
     m_wireframe = _wireframe;
@@ -202,6 +211,25 @@ void RenderMesh::SetColour(const glm::vec3 &_colour)
 }
 
 //-----------------------------------------------------------------------------------------------------------------------
+
+void RenderMesh::CreateShader()
+{
+    // setup shaders
+    m_shaderProg = new QOpenGLShaderProgram;
+    m_shaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, "../shader/instanceVert.glsl");
+    m_shaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, "../shader/instanceFrag.glsl");
+    m_shaderProg->bindAttributeLocation("vertex", 0);
+    m_shaderProg->bindAttributeLocation("normal", 1);
+    m_shaderProg->link();
+
+    m_shaderProg->bind();
+    m_projMatrixLoc = m_shaderProg->uniformLocation("projMatrix");
+    m_viewMatrixLoc = m_shaderProg->uniformLocation("viewMatrix");
+    m_lightPosLoc = m_shaderProg->uniformLocation("lightPos");
+
+    // Light position is fixed.
+    glUniform3fv(m_lightPosLoc, 1, &OpenGLScene::getLightPos()[0]);
+}
 
 void RenderMesh::CreateVAOs()
 {

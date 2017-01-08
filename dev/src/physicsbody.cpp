@@ -138,6 +138,7 @@ void PhysicsBody::InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &m
         m_rigidBodies.push_back(std::shared_ptr<btRigidBody>(new btRigidBody(sphereRBCI)));
         m_rigidBodies.back()->setUserIndex(id);
         m_rigidBodies.back()->setUserPointer((void*)this);
+        m_rigidBodies.back()->setFriction(1.0f);
 
 
         id++;
@@ -146,6 +147,11 @@ void PhysicsBody::InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &m
 
 void PhysicsBody::InitialiseInternalConstraints()
 {
+    if(m_rigidBodies.size() < 1)
+    {
+        return;
+    }
+
     bool constraintCheck[m_rigidBodies.size()][m_rigidBodies.size()] = {false};
     int i=0;
     for(auto sphere1 : m_rigidBodies)
