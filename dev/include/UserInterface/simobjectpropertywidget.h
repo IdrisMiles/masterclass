@@ -2,6 +2,8 @@
 #define PHSYICSBODYPROPERTIESWIDGET_H
 
 #include "include/UserInterface/simobjectproperties.h"
+#include "include/UserInterface/fixedconstraintwidget.h"
+#include "include/UserInterface/generic6dofspringconstraintwidget.h"
 #include <QTabWidget>
 #include <QGroupBox>
 #include <QGridLayout>
@@ -10,6 +12,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QComboBox>
+#include <QSlider>
 
 #include <glm/glm.hpp>
 
@@ -18,58 +21,6 @@
 
 class OpenGLScene;
 class SimObject;
-
-class FixedConstraintWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    FixedConstraintWidget(QWidget *parent = 0);
-    virtual ~FixedConstraintWidget();
-
-    QGridLayout *m_layout;
-
-    QLabel *m_internalSpringBreakingImpulseThresholdLabel;
-    QDoubleSpinBox *m_internalSpringBreakingImpulseThreshold;
-};
-
-class Generic6DOFSpringConstraintWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    Generic6DOFSpringConstraintWidget(QWidget *parent = 0);
-    virtual ~Generic6DOFSpringConstraintWidget();
-
-    QGridLayout *m_layout;
-
-    QLabel *m_internalSpringStiffnessLabel;
-    QDoubleSpinBox *m_internalSpringStiffness;
-    QLabel *m_internalSpringDampingLabel;
-    QDoubleSpinBox *m_internalSpringDamping;
-    QLabel *m_internalSpringBreakingImpulseThresholdLabel;
-    QDoubleSpinBox *m_internalSpringBreakingImpulseThreshold;
-
-    QLabel *m_linearLowerLimitLabel;
-    QDoubleSpinBox *m_linearLowerLimitXThreshold;
-    QDoubleSpinBox *m_linearLowerLimitYThreshold;
-    QDoubleSpinBox *m_linearLowerLimitZThreshold;
-
-    QLabel *m_linearUpperLimitLabel;
-    QDoubleSpinBox *m_linearUpperLimitXThreshold;
-    QDoubleSpinBox *m_linearUpperLimitYThreshold;
-    QDoubleSpinBox *m_linearUpperLimitZThreshold;
-
-    QLabel *m_angularLowerLimitLabel;
-    QDoubleSpinBox *m_angularLowerLimitXThreshold;
-    QDoubleSpinBox *m_angularLowerLimitYThreshold;
-    QDoubleSpinBox *m_angularLowerLimitZThreshold;
-
-    QLabel *m_angularUpperLimitLabel;
-    QDoubleSpinBox *m_angularUpperLimitXThreshold;
-    QDoubleSpinBox *m_angularUpperLimitYThreshold;
-    QDoubleSpinBox *m_angularUpperLimitZThreshold;
-};
 
 
 class SimObjectPropertiesWidget : public QGroupBox
@@ -90,22 +41,34 @@ public:
 
     QGroupBox *m_physProps;
     QGridLayout *m_physPropsLayout;
+
     QLabel *m_numSpheresLabel;
     QDoubleSpinBox *m_numSpheres;
+
     QLabel *m_minSphereRadLabel;
     QDoubleSpinBox *m_minSphereRad;
+
     QLabel *m_maxSphereRadLabel;
     QDoubleSpinBox *m_maxSphereRad;
+
     QCheckBox *m_overlapSpheres;
+
     QLabel *m_massLabel;
     QDoubleSpinBox *m_mass;
-    QLabel *m_youngsModulusLabel;
-    QDoubleSpinBox *m_youngsModulus;
+
     QLabel *m_yieldStrengthLabel;
     QDoubleSpinBox *m_yieldStrength;
+
     QCheckBox *m_selfCollisions;
+
+    QLabel *m_glueStrengthLabel;
+    QDoubleSpinBox *m_glueStrength;
+
     FixedConstraintWidget *m_fixedConstraintWidget;
     Generic6DOFSpringConstraintWidget *m_generic6DOFSpringConstraintWidget;
+
+    QLabel *m_constraintRadiusLabel;
+    QSlider *m_constraintRadius;
 
     QPushButton *m_loadPhysBody;
     QComboBox *m_constraintSelection;
@@ -120,7 +83,6 @@ public:
 
 
 public slots:
-    //void UpdatePhysicsBodyProperties();
     void UpdateRenderingProperties();
     void UpdatePhysicsProperties();
     void OnLoadPushButton();

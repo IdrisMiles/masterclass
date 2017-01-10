@@ -35,6 +35,7 @@ public:
     void Update();
     void UpdatePhysicsProps();
     void SetID(const int &_id){m_id = _id;}
+    std::vector<std::shared_ptr<btRigidBody>> getRigidBodies();
 
 
 private:

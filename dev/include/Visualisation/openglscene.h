@@ -36,7 +36,8 @@ public:
 
     void loadSimObject(const std::string &_file, std::shared_ptr<SimObjectProperties> _properties = nullptr);
     std::shared_ptr<SimObject> GetPhysicsBody(const unsigned &_i = 0) {return  (_i<m_simObjects.size())?m_simObjects[_i]:NULL;}
-    int NumPhysicsBodies()const {return m_simObjects.size();}
+    unsigned int NumPhysicsBodies()const;
+    unsigned int NumSimObject()const {return m_simObjects.size();}
 
     static glm::mat4 getProjMat(){return m_projMat;}
     static glm::mat4 getViewMat(){return m_viewMat;}
@@ -112,6 +113,8 @@ private:
     bool m_glInit;
     QTimer *m_physicsTimer;
     float m_dt;
+    int m_simSubSteps;
+//    int NumPhysicsBodies()
 
     bool m_cache;
 

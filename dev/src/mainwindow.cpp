@@ -57,6 +57,6 @@ void MainWindow::AddSimObject()
     SimObjectPropertiesWidget *pbWidget = dynamic_cast<SimObjectPropertiesWidget*>(m_propertiesTab->widget(id));
     m_glScene->loadSimObject(file.toStdString(), pbWidget->m_physicsProps);
     pbWidget->ConnectWithOpenGLScene(m_glScene);
-    pbWidget->ConnectWithSimObject(m_glScene->GetPhysicsBody(m_glScene->NumPhysicsBodies()-1));
+    pbWidget->ConnectWithSimObject(m_glScene->GetPhysicsBody(m_glScene->NumSimObject()-1));
 
 }

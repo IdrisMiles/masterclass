@@ -37,9 +37,19 @@ void RenderPhysicsBody::LoadMesh(const PhysicsBody &_physBody, std::shared_ptr<S
     }
 
     m_modelMat = glm::mat4(1.0f);
-    m_wireframe = false;
-    m_drawMesh = true;
-    m_colour = glm::vec3(0.8f,0.4f,0.4f);
+
+    if(m_physicsBodyProperties != nullptr)
+    {
+        m_wireframe = false;
+        m_drawMesh = m_physicsBodyProperties->RenderMesh.drawSpheres;
+        m_colour = m_physicsBodyProperties->RenderMesh.colour;
+    }
+    else
+    {
+        m_wireframe = false;
+        m_drawMesh = true;
+        m_colour = glm::vec3(0.6f,0.6f,0.6f);
+    }
 
 
     //----------------------------------------------------------------------

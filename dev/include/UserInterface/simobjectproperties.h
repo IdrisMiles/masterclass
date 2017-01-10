@@ -24,18 +24,18 @@ public:
         bool reload;
 
         float mass;
-        float youngsModulus;
         float yieldStrength;
 
         float internalSpringStiffness;
         float internalSpringDamping;
-        float internalSpringBreakingImpulseThreshold;
+        float GlueStrength;
         glm::vec3 linearLowerLimit;
         glm::vec3 linearUpperLimit;
         glm::vec3 angularLowerLimit;
         glm::vec3 angularUpperLimit;
 
         ConstraintTypes constraintType;
+        float constraintRadius;
     }PhysBody;
 
 

@@ -1,6 +1,7 @@
 #include "include/Physics/physicsbody.h"
 #include "include/SpherePacking/meshspherepacker.h"
 #include <float.h>
+#include <iostream>
 
 PhysicsBody::PhysicsBody()
 {
@@ -128,9 +129,8 @@ void PhysicsBody::InitialiseSphericalRigidbodies(const std::vector<glm::vec3> &m
         float r = sphere.w;
 
         m_collisionShapes.push_back(new btSphereShape(r));
-        //m_collisionShapes.back()->setUserPointer((void*)this);
         m_motionStates.push_back(new btDefaultMotionState(btTransform(btQuaternion::getIdentity(), btVector3(x, y, z))));
-        btScalar mass = 1.0f;
+        btScalar mass = m_physicsBodyProperties->PhysBody.mass;// 1.0f;
         btVector3 sphereInertia = btVector3(0,0,0);
         m_collisionShapes.back()->calculateLocalInertia(mass,sphereInertia);
         btRigidBody::btRigidBodyConstructionInfo sphereRBCI(/*(4.0/3.0) * M_PI * r*r*r**/ mass, m_motionStates.back(), m_collisionShapes.back(), sphereInertia);
@@ -181,7 +181,7 @@ void PhysicsBody::InitialiseInternalConstraints()
 
 
                 float dist = pos1.distance(pos2);
-                if(dist <= 1.5f*(r1+r2))
+                if(dist <= m_physicsBodyProperties->PhysBody.constraintRadius*(r1+r2))
                 {
                     m_internalConstraints.push_back(CreateConstraint(*sphere1, *sphere2));
                 }
@@ -214,25 +214,32 @@ std::shared_ptr<btTypedConstraint> PhysicsBody::CreateConstraint(btRigidBody &ri
     if (m_physicsBodyProperties->PhysBody.constraintType == ConstraintTypes::Fixed)
     {
         std::shared_ptr<btFixedConstraint> constraint = std::shared_ptr<btFixedConstraint>(new btFixedConstraint(rigidA, rigidB, frameInA, frameInB));
-        constraint->setBreakingImpulseThreshold(m_physicsBodyProperties->PhysBody.internalSpringBreakingImpulseThreshold);
+        constraint->setBreakingImpulseThreshold(1000000);
         return constraint;
     }
     else if(m_physicsBodyProperties->PhysBody.constraintType == ConstraintTypes::Generic6DOFSpring)
     {
         std::shared_ptr<btGeneric6DofSpringConstraint> constraint = std::shared_ptr<btGeneric6DofSpringConstraint>(new btGeneric6DofSpringConstraint(rigidA, rigidB, frameInA, frameInB, true));
-//            constraint->setStiffness(0, 1.0f);
-//            constraint->setDamping(0, 1.0f);
-        constraint->setBreakingImpulseThreshold(m_physicsBodyProperties->PhysBody.internalSpringBreakingImpulseThreshold);
-        constraint->setLinearLowerLimit(btVector3(0,0,0));
-        constraint->setLinearUpperLimit(btVector3(1, 1, 1));
-        constraint->setAngularLowerLimit(btVector3( 0, 0, 0 ));
-        constraint->setAngularUpperLimit(btVector3( 0, 0, 0 ));
+        constraint->setStiffness(0, m_physicsBodyProperties->PhysBody.internalSpringStiffness);
+        constraint->setStiffness(1, m_physicsBodyProperties->PhysBody.internalSpringStiffness);
+        constraint->setStiffness(2, m_physicsBodyProperties->PhysBody.internalSpringStiffness);
+        constraint->setDamping(0, m_physicsBodyProperties->PhysBody.internalSpringDamping);
+        constraint->setDamping(1, m_physicsBodyProperties->PhysBody.internalSpringDamping);
+        constraint->setDamping(2, m_physicsBodyProperties->PhysBody.internalSpringDamping);
+        constraint->setBreakingImpulseThreshold(1000000);
+        constraint->setLinearLowerLimit(btVector3(m_physicsBodyProperties->PhysBody.linearLowerLimit.x, m_physicsBodyProperties->PhysBody.linearLowerLimit.y,m_physicsBodyProperties->PhysBody.linearLowerLimit.z));
+        constraint->setLinearUpperLimit(btVector3(m_physicsBodyProperties->PhysBody.linearUpperLimit.x, m_physicsBodyProperties->PhysBody.linearUpperLimit.y,m_physicsBodyProperties->PhysBody.linearUpperLimit.z));
+        constraint->setAngularLowerLimit(btVector3(m_physicsBodyProperties->PhysBody.angularLowerLimit.x, m_physicsBodyProperties->PhysBody.angularLowerLimit.y,m_physicsBodyProperties->PhysBody.angularLowerLimit.z));
+        constraint->setAngularUpperLimit(btVector3(m_physicsBodyProperties->PhysBody.angularUpperLimit.x, m_physicsBodyProperties->PhysBody.angularUpperLimit.y,m_physicsBodyProperties->PhysBody.angularUpperLimit.z));
+
+
+
         return constraint;
     }
     else
     {
         std::shared_ptr<btFixedConstraint> constraint = std::shared_ptr<btFixedConstraint>(new btFixedConstraint(rigidA, rigidB, frameInA, frameInB));
-        constraint->setBreakingImpulseThreshold(m_physicsBodyProperties->PhysBody.internalSpringBreakingImpulseThreshold);
+        constraint->setBreakingImpulseThreshold(1000000);
         return constraint;
     }
 
@@ -260,7 +267,7 @@ void PhysicsBody::AddRigidBodiesToDynamicWorld(btDiscreteDynamicsWorld * _dynami
 {
     if(_dynamicWorld != nullptr)
     {
-        for( auto rb : m_rigidBodies)
+        for( auto &&rb : m_rigidBodies)
         {
             if(_selfCollisions)
             {
@@ -278,7 +285,7 @@ void PhysicsBody::AddConstraintsToDynamicWorld(btDiscreteDynamicsWorld * _dynami
 {
     if(_dynamicWorld != nullptr)
     {
-        for( auto ic : m_internalConstraints)
+        for( auto &&ic : m_internalConstraints)
         {
             _dynamicWorld->addConstraint(ic.get());
         }
@@ -289,7 +296,7 @@ void PhysicsBody::RemoveRigidBodiesFromDynamicWorld(btDiscreteDynamicsWorld * _d
 {
     if(_dynamicWorld != nullptr)
     {
-        for( auto rb : m_rigidBodies)
+        for( auto &&rb : m_rigidBodies)
         {
             if(rb != nullptr)
             {
@@ -366,7 +373,7 @@ void PhysicsBody::GetUpdatedSpheres(std::vector<glm::vec4> &_spheres) const
 void PhysicsBody::GetSpheresMatrices(std::vector<glm::mat4> &_sphereMats) const
 {
     _sphereMats.clear();
-    for( auto rb : m_rigidBodies)
+    for( auto &&rb : m_rigidBodies)
     {
         btTransform worldTransform;
         rb->getMotionState()->getWorldTransform(worldTransform);
@@ -428,4 +435,11 @@ void PhysicsBody::UpdatePlasticConstraints()
             m_dynamicWorld->addConstraint(m_internalConstraints[i].get());
         }
     }
+}
+
+
+
+std::vector<std::shared_ptr<btRigidBody>> PhysicsBody::getRigidBodies()
+{
+    return m_rigidBodies;
 }

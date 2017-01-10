@@ -38,6 +38,7 @@ OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     initializePhysicsWorld();
 
     m_dt = 0.016f;
+    m_simSubSteps = 5;
     m_physicsTimer = new QTimer(this);
     connect(m_physicsTimer, SIGNAL(timeout()), this, SLOT(updateSimulation()));
 
@@ -170,7 +171,7 @@ void OpenGLScene::cleanPhysicsWorld()
 void OpenGLScene::loadSimObject(const std::string &_file, std::shared_ptr<SimObjectProperties> _properties)
 {
     makeCurrent();
-    m_simObjects.push_back(std::shared_ptr<SimObject>(new SimObject(m_simObjects.size(), _properties)));
+    m_simObjects.push_back(std::shared_ptr<SimObject>(new SimObject(/*m_simObjects.size()*/ NumPhysicsBodies(), _properties)));
     m_simObjects.back()->LoadMesh(_file);
     m_simObjects.back()->AddToDynamicWorld(m_dynamicWorld);
     doneCurrent();
@@ -375,7 +376,7 @@ void OpenGLScene::updateSimulation()
 {
     if(m_runSim)
     {
-        m_dynamicWorld->stepSimulation(m_dt, 20);
+        m_dynamicWorld->stepSimulation(m_dt, m_simSubSteps, btScalar(1.*m_dt)/btScalar(m_simSubSteps));
         for(auto &&so : m_simObjects)
         {
             so->Update();
@@ -393,6 +394,22 @@ void OpenGLScene::CacheSim()
 {
 
 }
+
+//--------------------------------------------------------------------------------------------------
+// Misc methods
+unsigned int OpenGLScene::NumPhysicsBodies() const
+{
+    unsigned int total = 0;
+
+    for(auto &&so : m_simObjects)
+    {
+        total += so->NumPhysicsBodies();
+    }
+
+    return total;
+}
+
+
 
 //--------------------------------------------------------------------------------------------------
 // Qt methods

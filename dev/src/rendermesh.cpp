@@ -41,9 +41,19 @@ void RenderMesh::LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties
     }
 
     m_modelMat = glm::mat4(1.0f);
-    m_wireframe = false;
-    m_drawMesh = true;
-    m_colour = glm::vec3(0.8f,0.4f,0.4f);
+
+    if(m_physicsBodyProperties != nullptr)
+    {
+        m_wireframe = m_physicsBodyProperties->RenderMesh.drawWireframe;
+        m_drawMesh = m_physicsBodyProperties->RenderMesh.drawMesh;
+        m_colour = m_physicsBodyProperties->RenderMesh.colour;
+    }
+    else
+    {
+        m_wireframe = false;
+        m_drawMesh = true;
+        m_colour = glm::vec3(0.6f,0.6f,0.6f);
+    }
 
     //----------------------------------------------------------------------
 
@@ -135,7 +145,14 @@ void RenderMesh::InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres)
         // normalize the weights for this vert
         for(unsigned int k=0; k<m_skinWeights[i].size(); k++)
         {
-            m_skinWeights[i][k].second = (1.0f - (m_skinWeights[i][k].second / totalDist))/(maxNumNeighs-1);
+            if(maxNumNeighs > 1)
+            {
+                m_skinWeights[i][k].second = (1.0f - (m_skinWeights[i][k].second / totalDist))/(maxNumNeighs-1);
+            }
+            else
+            {
+                m_skinWeights[i][k].second = 1.0f;
+            }
             newtotalWeight += m_skinWeights[i][k].second;
         }
 
