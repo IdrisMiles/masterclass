@@ -8,6 +8,7 @@ Plastic and elastic deformation using spherical rigidbody dynamics
 
 ## Build
 ```bash
+cd PROJECT_DIR
 qmake
 make clean
 make
