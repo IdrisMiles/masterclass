@@ -13,10 +13,11 @@ glm::mat4 OpenGLScene::m_modelMat;
 glm::vec3 OpenGLScene::m_lightPos;
 
 OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
-    m_xRot(0),
-    m_yRot(0),
+    m_xRot(12*16),
+    m_yRot(25
+           *16),
     m_zRot(0),
-    m_zDis(200),
+    m_zDis(2700),
     m_shaderProg(0)
 {
     QSurfaceFormat format;
