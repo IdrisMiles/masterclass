@@ -15,6 +15,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_glScene = new OpenGLScene(this);
     m_propertiesGroupbox = new QGroupBox("Properties" ,this);
     m_propertiesTab = new QTabWidget(m_propertiesGroupbox);
+    m_simStepsLabel = new QLabel("Simulation Sub-Steps", m_propertiesGroupbox);
+    m_simStepsSlider = new QSlider(Qt::Horizontal, m_propertiesGroupbox);
+    m_simStepsSlider->setMinimum(1);
+    m_simStepsSlider->setMaximum(100);
 
     // Add OpenGLScene widget
     ui->gridLayout->addWidget(m_glScene, 0, 0, 2, 2);
@@ -22,14 +26,16 @@ MainWindow::MainWindow(QWidget *parent) :
     // Add Physicsbody Properties widget
     ui->gridLayout->addWidget(m_propertiesGroupbox, 0, 2, 1, 1);
     QGridLayout *propertiesLayout = new QGridLayout(m_propertiesGroupbox);
-    propertiesLayout->addWidget(m_propertiesTab, 0, 0, 1, 1);
+    propertiesLayout->addWidget(m_propertiesTab, 0, 0, 1, 2 );
+    propertiesLayout->addWidget(m_simStepsLabel, 1, 0, 1, 1);
+    propertiesLayout->addWidget(m_simStepsSlider, 1, 1, 1, 1);
     m_propertiesGroupbox->setLayout(propertiesLayout);
 
 
     // Set up Signal and Slot connections
     connect(ui->s_LoadModel, SIGNAL(released()), this, SLOT(AddSimObject()));
     connect(ui->s_runSimBtn, SIGNAL(released()), m_glScene, SLOT(ToggleSim()));
-
+    connect(m_simStepsSlider, SIGNAL(sliderMoved(int)), m_glScene, SLOT(SetSimulationSteps(int)));
 }
 
 
@@ -37,7 +43,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_glScene;
-
+    delete m_simStepsSlider;
 }
 
 

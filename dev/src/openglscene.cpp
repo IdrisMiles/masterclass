@@ -395,6 +395,12 @@ void OpenGLScene::CacheSim()
 
 }
 
+
+void OpenGLScene::SetSimulationSteps(int _simSteps)
+{
+    m_simSubSteps = _simSteps;
+}
+
 //--------------------------------------------------------------------------------------------------
 // Misc methods
 unsigned int OpenGLScene::NumPhysicsBodies() const

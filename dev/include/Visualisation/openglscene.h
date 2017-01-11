@@ -54,6 +54,7 @@ public slots:
     void setZTranslation(int z);
     void cleanup();
     void updateSimulation();
+    void SetSimulationSteps(int _simSteps);
 
 
 protected:
@@ -114,7 +115,6 @@ private:
     QTimer *m_physicsTimer;
     float m_dt;
     int m_simSubSteps;
-//    int NumPhysicsBodies()
 
     bool m_cache;
 

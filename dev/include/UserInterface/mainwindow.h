@@ -8,7 +8,8 @@
 #include <QMainWindow>
 #include <QTabWidget>
 #include <QGroupBox>
-
+#include <QSlider>
+#include <QLabel>
 
 
 namespace Ui {
@@ -32,6 +33,8 @@ private:
     OpenGLScene *m_glScene;
     QGroupBox *m_propertiesGroupbox;
     QTabWidget * m_propertiesTab;
+    QLabel *m_simStepsLabel;
+    QSlider *m_simStepsSlider;
 };
 
 #endif // MAINWINDOW_H
