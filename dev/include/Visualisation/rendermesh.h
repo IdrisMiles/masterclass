@@ -1,6 +1,12 @@
 #ifndef RENDERMESH_H
 #define RENDERMESH_H
 
+
+/// @author Idris Miles
+/// @version 0.1.0
+/// @date 10th January 2017
+
+
 // Open GL includes
 #include <GL/glew.h>
 #include <QOpenGLShaderProgram>
@@ -13,7 +19,7 @@
 
 #include <memory>
 
-
+/// @class RenderMesh class. This class render a skinned mesh, using PhysicsBody to deform the mesh.
 class RenderMesh
 {
 public:
@@ -27,6 +33,7 @@ public:
     void InitialiseSkinWeights(const std::vector<glm::vec4> &_spheres);
     void InitialiseSkinWeights(const PhysicsBody &_physBody);
     void Skin(const std::vector<glm::vec4> &_spheres);
+    void Skin(const PhysicsBody &_physBody);
 
     // Setter
     void SetWireframe(const bool &_wireframe);

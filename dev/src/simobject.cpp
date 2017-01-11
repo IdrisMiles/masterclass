@@ -41,6 +41,7 @@ void SimObject::LoadMesh(const std::string _meshFile)
             m_mesh[i].InitialiseSkinWeights(m_physBody[i]);
         }
 
+        // Load glue constraints
 //        for(int i=0;i<mesh.size();i++)
 //        {
 //            for(int j=0;j<mesh.size();j++)
@@ -54,10 +55,6 @@ void SimObject::LoadMesh(const std::string _meshFile)
 //            }
 //        }
     }
-
-    printf("%u meshes\n", m_mesh.size());
-    printf("%u phys mesh\n", m_physMesh.size());
-    printf("%u phys body\n", m_physBody.size());
 }
 
 void SimObject::AddToDynamicWorld(btDiscreteDynamicsWorld * _dynamicWorld, const bool _selfCollisions)
@@ -103,9 +100,7 @@ void SimObject::Draw()
     for(unsigned int i=0; i<m_mesh.size(); i++)
     {
         // Draw the mesh
-        std::vector<glm::vec4> spheres;
-        m_physBody[i].GetUpdatedSpheres(spheres);
-        m_mesh[i].Skin(spheres);
+        m_mesh[i].Skin(m_physBody[i]);
         m_mesh[i].DrawMesh();
 
         // Draw the phsyics mesh (spheres)

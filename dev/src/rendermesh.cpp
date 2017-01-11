@@ -212,6 +212,13 @@ void RenderMesh::Skin(const std::vector<glm::vec4> &_spheres)
     }
 }
 
+void RenderMesh::Skin(const PhysicsBody &_physBody)
+{
+    std::vector<glm::vec4> spheres;
+    _physBody.GetUpdatedSpheres(spheres);
+    Skin(spheres);
+}
+
 void RenderMesh::SetWireframe(const bool &_wireframe)
 {
     m_wireframe = _wireframe;

@@ -3,11 +3,6 @@
 #include <float.h>
 #include <iostream>
 
-PhysicsBody::PhysicsBody()
-{
-    m_id = 0;
-    m_meshLoaded = false;
-}
 
 PhysicsBody::PhysicsBody(const unsigned int _id, std::shared_ptr<SimObjectProperties> _properties)
 {

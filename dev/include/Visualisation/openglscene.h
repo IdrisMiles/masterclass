@@ -113,6 +113,7 @@ private:
 
     bool m_glInit;
     QTimer *m_physicsTimer;
+    QTimer *m_renderTimer;
     float m_dt;
     int m_simSubSteps;
 

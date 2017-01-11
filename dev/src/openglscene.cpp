@@ -14,8 +14,7 @@ glm::vec3 OpenGLScene::m_lightPos;
 
 OpenGLScene::OpenGLScene(QWidget *parent) : QOpenGLWidget(parent),
     m_xRot(12*16),
-    m_yRot(25
-           *16),
+    m_yRot(25*16),
     m_zRot(0),
     m_zDis(2700),
     m_shaderProg(0)
@@ -377,13 +376,19 @@ void OpenGLScene::updateSimulation()
 {
     if(m_runSim)
     {
+        // step simulation
         m_dynamicWorld->stepSimulation(m_dt, m_simSubSteps, btScalar(1.*m_dt)/btScalar(m_simSubSteps));
+
+        // update individual simobjects
         for(auto &&so : m_simObjects)
         {
             so->Update();
         }
+
+        // update render
         update();
 
+        // cache
         if(m_cache)
         {
             CacheSim();

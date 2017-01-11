@@ -1,6 +1,12 @@
 #ifndef CACHEDSIM_H
 #define CACHEDSIM_H
 
+
+/// @author Idris Miles
+/// @version 0.1.0
+/// @date 10th January 2017
+
+
 #include "include/Physics/cachedparticle.h"
 
 class CachedSimObject

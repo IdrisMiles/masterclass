@@ -1,6 +1,10 @@
 #ifndef PHYSICSBODY_H
 #define PHYSICSBODY_H
 
+/// @author Idris Miles
+/// @version 0.1.0
+/// @date 10th January 2017
+
 
 // GLM includes
 #include <glm/glm.hpp>
@@ -16,12 +20,12 @@
 #include <memory>
 #include <vector>
 
-
+/// @class PhysicsBody class. This class handles various physics objects such as rigidbodies and constraints that make up a mesh.
 class PhysicsBody
 {
 public:
-    PhysicsBody();
-    PhysicsBody(const unsigned int _id, std::shared_ptr<SimObjectProperties> _properties = nullptr);
+
+    PhysicsBody(const unsigned int _id = 0, std::shared_ptr<SimObjectProperties> _properties = nullptr);
     ~PhysicsBody();
     void LoadMesh(const std::vector<glm::vec3> &meshVerts, const std::vector<glm::ivec3> &meshTris, std::shared_ptr<SimObjectProperties> _props = nullptr);
     void LoadMesh(const Mesh &_mesh, std::shared_ptr<SimObjectProperties> _props = nullptr);
@@ -62,10 +66,11 @@ private:
     std::vector<std::shared_ptr<btRigidBody>> m_rigidBodies;
     std::vector<std::shared_ptr<btTypedConstraint>> m_internalConstraints;
 
-    Mesh m_mesh;
-    std::vector<glm::vec4> m_spheres;
     std::shared_ptr<SimObjectProperties> m_physicsBodyProperties;
     btDiscreteDynamicsWorld * m_dynamicWorld;
+
+    Mesh m_mesh;
+    std::vector<glm::vec4> m_spheres;
 };
 
 #endif // PHYSICSBODY_H
